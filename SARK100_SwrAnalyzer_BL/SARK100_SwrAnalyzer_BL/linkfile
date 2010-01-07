@@ -1,0 +1,8 @@
+-F0x30 -g -blit:0x1a0.0x7fff 
+ -bdata:0.0x6ff -bSSCParmBlk:0x00F7.0x00FF -BInterruptRAM:0 -Bvirtual_registers  
+ -Bsark100_swranalyzer_bl_RAM 
+-bBootCheckSum:0x7200.0x73ff
+-bBootLoaderArea:0x7400.0x7fff
+ -o"output/SARK100_SwrAnalyzer_BL" 
+ ./obj/bootloader.o ./obj/bootloaderconfig.o ./obj/buzzer.o ./obj/calcs.o ./obj/calibrate_reflectometer.o ./obj/dds.o ./obj/display.o ./obj/flashapi.o ./obj/glb_data.o ./obj/keypad.o ./obj/main.o ./obj/measure.o ./obj/msg_eng.o ./obj/pclink.o ./obj/sleep_timer.o ./obj/storage.o ./obj/util.o   
+ C:/work/RadioHam/psoc/SWRANA~1/prj/SARK10~1/SARK10~1/SARK10~1/lib/libPSoc.a -LC:/ARCHIV~1/Cypress/Common/CYPRES~3/tools/lib/LMM/eightpages C:/ARCHIV~1/Cypress/Common/CYPRES~3/tools/lib/CY8C29000/cms.a C:/ARCHIV~1/Cypress/Common/CYPRES~3/tools/lib/LMM/UASW/MAC/arith.a  

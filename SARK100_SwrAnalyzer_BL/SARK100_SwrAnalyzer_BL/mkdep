@@ -1,0 +1,18 @@
+-a -f project.dep -p./lib/obj/ -o.o -- -IC:/ARCHIV~1/Cypress/Common/CYPRES~3/tools/include -I./lib -IC:/ARCHIV~1/Cypress/Common/CYPRES~3/tools/include/CY8C29~1 -- 
+lib/adcinc12.asm   
+lib/adcinc12int.asm   
+lib/amux4_adc.asm   
+lib/e2prom.asm   
+lib/lcd.asm   
+lib/pga_adc.asm   
+lib/pga_dds_1.asm   
+lib/pga_dds_2.asm   
+lib/psocconfig.asm   
+lib/psocconfigtbl.asm   
+lib/pwm8_buzz.asm   
+lib/pwm8_buzzint.asm   
+lib/timer16_delay.asm   
+lib/timer16_delayint.asm   
+lib/uart.asm   
+lib/uartint.asm   
+lib/uartplus.asm 

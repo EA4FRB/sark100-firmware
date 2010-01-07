@@ -1,0 +1,7 @@
+open cct: 4vpp vf= 2v, vr=1v
+50ohm: 2vpp  vr:1.45v vr: 0
+150ohm: 3vpp vf:1.67 vr:0.372
+
+AN2099
+AN2226
+AN2276
