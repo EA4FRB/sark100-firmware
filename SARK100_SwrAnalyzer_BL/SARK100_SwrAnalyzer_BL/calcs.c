@@ -5,18 +5,18 @@
 //  Melchor Varela, Madrid, Spain.
 //  melchor.varela@gmail.com
 //
-//  "EA4FRB SWR Analyzer firmware" is free software: you can redistribute it 
-//  and/or modify it under the terms of the GNU General Public License as 
-//  published by the Free Software Foundation, either version 3 of the License, 
+//  "EA4FRB SWR Analyzer firmware" is free software: you can redistribute it
+//  and/or modify it under the terms of the GNU General Public License as
+//  published by the Free Software Foundation, either version 3 of the License,
 //  or (at your option) any later version.
 //
-//  "EA4FRB SWR Analyzer firmware" is distributed in the hope that it will be 
+//  "EA4FRB SWR Analyzer firmware" is distributed in the hope that it will be
 //  useful,  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with "EA4FRB SWR Analyzer firmware".  If not, 
+//  along with "EA4FRB SWR Analyzer firmware".  If not,
 //  see <http://www.gnu.org/licenses/>.
 //*****************************************************************************/
 //*****************************************************************************/
@@ -27,6 +27,7 @@
 //
 // 	DESCRIPTION
 //
+//	SWR and impedance calculation routines
 //
 // 	HISTORY
 //
@@ -74,7 +75,7 @@ static WORD Calc_Sqrt (DWORD dwN);
 //  DESCRIPTION:
 //
 //	Calculates SWR based on VF and VR values
-//	Notice that wVf value is x2 because it is measured at the bridge input, and 
+//	Notice that wVf value is x2 because it is measured at the bridge input, and
 //	wVr is also x2 because the PGA gain is set to double, so both compensates and
 //	it is not needed further calculation
 //
@@ -94,13 +95,13 @@ WORD Calculate_Swr (DWORD dwVf, DWORD dwVr)
 
 	if (dwVf>dwVr)
 		dwDenominator = dwVf-dwVr;
-	else if (dwVr>dwVf)	
+	else if (dwVr>dwVf)
 		dwDenominator = dwVr-dwVf;
 	else
 		return (WORD) -1;		//Error
 
 	dwNumerator = (dwVf+dwVr)*100;
-	
+
 	return (dwNumerator/dwDenominator);
 }
 //-----------------------------------------------------------------------------
@@ -123,10 +124,10 @@ WORD Calculate_Z (WORD wSwr, DWORD dwVz, DWORD dwVa)
 {
 	if (wSwr>999)
 		return -1;
-		
+
 	if (dwVa == 0)			// Avoids divide by zero
 		return (WORD)-1;
-		
+
 	return ((DWORD)(dwVz * (DWORD)50))/dwVa;
 }
 
@@ -160,18 +161,18 @@ WORD Calculate_R (WORD wZ, WORD wSwr)
 	if (wSwr>999)
 	{
 		return -1;
-#if 0		
+#if 0
 		wSwr /= 100;
 		wZ /= 100;
 		dwDenominator = (((DWORD)wSwr*wSwr)/2)+5000;
-		if (dwDenominator == 0)	//Avoids divide by zero					
+		if (dwDenominator == 0)	//Avoids divide by zero
 			return (WORD)-1;
 		dwNumerator = (((DWORD)wZ*wZ) + 2500) * (DWORD)wSwr;
 		return ((DWORD)dwNumerator*100)/dwDenominator;
-#endif		
+#endif
 	}
 	dwDenominator = (((DWORD)wSwr*wSwr)/2)+5000;
-	if (dwDenominator == 0)	//Avoids divide by zero					
+	if (dwDenominator == 0)	//Avoids divide by zero
 		return (WORD)-1;
 	dwNumerator = (((DWORD)wZ*wZ) + 2500) * (DWORD)wSwr;
 
@@ -197,14 +198,14 @@ WORD Calculate_R (WORD wZ, WORD wSwr)
 WORD Calculate_X (WORD wZ, WORD wR)
 {
 	DWORD dwTemp;
-	
+
 	if (wZ == -1 || wR == -1)
 		return -1;
 	dwTemp = ((DWORD)wZ*wZ)-((DWORD)wR*wR);
 	if ((signed long)dwTemp<0)
 		return 0;
 	return Calc_Sqrt(dwTemp);
-}		
+}
 
 //-----------------------------------------------------------------------------
 //  FUNCTION NAME:	Calculate_L
@@ -227,7 +228,7 @@ WORD Calculate_L (WORD wX, DWORD dwFreq)
 	if (wX == -1)
 		return -1;
 	return ((DWORD)((DWORD)wX*100000))/((DWORD)63*dwFreq);
-}	
+}
 
 //-----------------------------------------------------------------------------
 //  FUNCTION NAME:	Calculate_C
@@ -251,12 +252,12 @@ WORD Calculate_C (WORD wX, DWORD dwFreq)
 		return 0;
 	if (wX == -1)
 		return -1;
-	return (DWORD)100/((DWORD)628*dwFreq*(DWORD)wX);		
+	return (DWORD)100/((DWORD)628*dwFreq*(DWORD)wX);
 }
 
 
 //-----------------------------------------------------------------------------
-//  FUNCTION NAME:	Calc_Sqrt 
+//  FUNCTION NAME:	Calc_Sqrt
 //
 //  DESCRIPTION:
 //
@@ -274,7 +275,7 @@ static WORD Calc_Sqrt (DWORD dwN)
 	DWORD dwRem = 0;
 	DWORD dwRoot = 0;
 	BYTE ii;
-	
+
 	for (ii=0;ii<16;ii++)
 	{
 		dwRoot <<= 1;
@@ -289,7 +290,7 @@ static WORD Calc_Sqrt (DWORD dwN)
 		else
 		{
 			dwRoot--;
-		}	
+		}
 	}
 	return (WORD)(dwRoot>>1);
 }
@@ -324,7 +325,7 @@ void Do_Test_Calcs ( void )
 	wX = Calculate_X(wZ, wR);
 	wC = Calculate_C(wX, dwCurrentFreq);
 	wL = Calculate_L(wX, dwCurrentFreq);
-	
+
 	//50 Ohm
 	g_xBridgeMeasure.Vf = 4096*100;
 	g_xBridgeMeasure.Vr = 0*100;
@@ -336,7 +337,7 @@ void Do_Test_Calcs ( void )
 	wX = Calculate_X(wZ, wR);
 	wC = Calculate_C(wX, dwCurrentFreq);
 	wL = Calculate_L(wX, dwCurrentFreq);
-	
+
 	//150 Ohm
 	g_xBridgeMeasure.Vf = 4096*100;
 	g_xBridgeMeasure.Vr = 2048*100;
@@ -348,7 +349,7 @@ void Do_Test_Calcs ( void )
 	wX = Calculate_X(wZ, wR);
 	wC = Calculate_C(wX, dwCurrentFreq);
 	wL = Calculate_L(wX, dwCurrentFreq);
-	
+
 	//0 Ohm
 	g_xBridgeMeasure.Vf = 4096*100;
 	g_xBridgeMeasure.Vr = 4096*100;
@@ -360,8 +361,8 @@ void Do_Test_Calcs ( void )
 	wX = Calculate_X(wZ, wR);
 	wC = Calculate_C(wX, dwCurrentFreq);
 	wL = Calculate_L(wX, dwCurrentFreq);
-	
-	
+
+
 	//500 Ohm
 	g_xBridgeMeasure.Vf = 4096*100;
 	g_xBridgeMeasure.Vr = 3351*100;
@@ -373,7 +374,7 @@ void Do_Test_Calcs ( void )
 	wX = Calculate_X(wZ, wR);
 	wC = Calculate_C(wX, dwCurrentFreq);
 	wL = Calculate_L(wX, dwCurrentFreq);
-	
+
 	//1000 Ohm
 	g_xBridgeMeasure.Vf = 4096*100;
 	g_xBridgeMeasure.Vr = 3706*100;
@@ -385,7 +386,7 @@ void Do_Test_Calcs ( void )
 	wX = Calculate_X(wZ, wR);
 	wC = Calculate_C(wX, dwCurrentFreq);
 	wL = Calculate_L(wX, dwCurrentFreq);
-	
+
 	//2000 Ohm
 	g_xBridgeMeasure.Vf = 4096*100;
 	g_xBridgeMeasure.Vr = 3896*100;
@@ -397,7 +398,7 @@ void Do_Test_Calcs ( void )
 	wX = Calculate_X(wZ, wR);
 	wC = Calculate_C(wX, dwCurrentFreq);
 	wL = Calculate_L(wX, dwCurrentFreq);
-	
+
 	//3000 Ohm
 	g_xBridgeMeasure.Vf = 4096*100;
 	g_xBridgeMeasure.Vr = 3962*100;
@@ -409,7 +410,7 @@ void Do_Test_Calcs ( void )
 	wX = Calculate_X(wZ, wR);
 	wC = Calculate_C(wX, dwCurrentFreq);
 	wL = Calculate_L(wX, dwCurrentFreq);
-	
+
 	//10K Ohm
 	g_xBridgeMeasure.Vf = 4096*100;
 	g_xBridgeMeasure.Vr = 4055*100;
@@ -421,7 +422,7 @@ void Do_Test_Calcs ( void )
 	wX = Calculate_X(wZ, wR);
 	wC = Calculate_C(wX, dwCurrentFreq);
 	wL = Calculate_L(wX, dwCurrentFreq);
-	
+
 	//open Ohm
 	g_xBridgeMeasure.Vf = 4096*100;
 	g_xBridgeMeasure.Vr = 4096*100;
