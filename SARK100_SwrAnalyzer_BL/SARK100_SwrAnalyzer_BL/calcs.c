@@ -1,27 +1,27 @@
 //*****************************************************************************/
-//  This file is a part of the "EA4FRB SWR Analyzer firmware"
+//  This file is a part of the "SARK100 SWR Analyzer firmware"
 //
 //  Copyright © 2010 Melchor Varela - EA4FRB.  All rights reserved.
 //  Melchor Varela, Madrid, Spain.
 //  melchor.varela@gmail.com
 //
-//  "EA4FRB SWR Analyzer firmware" is free software: you can redistribute it
+//  "SARK100 SWR Analyzer firmware" is free software: you can redistribute it
 //  and/or modify it under the terms of the GNU General Public License as
 //  published by the Free Software Foundation, either version 3 of the License,
 //  or (at your option) any later version.
 //
-//  "EA4FRB SWR Analyzer firmware" is distributed in the hope that it will be
+//  "SARK100 SWR Analyzer firmware" is distributed in the hope that it will be
 //  useful,  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with "EA4FRB SWR Analyzer firmware".  If not,
+//  along with "SARK100 SWR Analyzer firmware".  If not,
 //  see <http://www.gnu.org/licenses/>.
 //*****************************************************************************/
 //*****************************************************************************/
 //
-//	PROJECT:	SWR Analyzer
+//	PROJECT:	SARK100 SWR Analyzer
 // 	FILE NAME: 	CALCS.C
 // 	AUTHOR:		EA4FRB - Melchor Varela
 //
@@ -161,15 +161,6 @@ WORD Calculate_R (WORD wZ, WORD wSwr)
 	if (wSwr>999)
 	{
 		return -1;
-#if 0
-		wSwr /= 100;
-		wZ /= 100;
-		dwDenominator = (((DWORD)wSwr*wSwr)/2)+5000;
-		if (dwDenominator == 0)	//Avoids divide by zero
-			return (WORD)-1;
-		dwNumerator = (((DWORD)wZ*wZ) + 2500) * (DWORD)wSwr;
-		return ((DWORD)dwNumerator*100)/dwDenominator;
-#endif
 	}
 	dwDenominator = (((DWORD)wSwr*wSwr)/2)+5000;
 	if (dwDenominator == 0)	//Avoids divide by zero
@@ -214,20 +205,26 @@ WORD Calculate_X (WORD wZ, WORD wR)
 //
 //	Calculates inductance
 //
-//           L = ((X*10)*10000)/(63*f)
+//   	L=10^6*X/2*PI*freq
 //
 //  ARGUMENTS:
 //     none.
 //
 //  RETURNS:
-//     none.
+//     Inductance value in *10 uH.
 //
 //-----------------------------------------------------------------------------
 WORD Calculate_L (WORD wX, DWORD dwFreq)
 {
+	DWORD dwTemp;
+
 	if (wX == -1)
 		return -1;
-	return ((DWORD)((DWORD)wX*100000))/((DWORD)63*dwFreq);
+
+	dwFreq /= 1000;		//Hz to Khz
+
+	dwTemp = ((DWORD)wX*100000)/628;
+	return dwTemp / dwFreq;
 }
 
 //-----------------------------------------------------------------------------
@@ -237,13 +234,13 @@ WORD Calculate_L (WORD wX, DWORD dwFreq)
 //
 //	Calculates capacitance
 //
-//           C=1/(6.28*freq*X)
+//           C=10^12/(2*PI*freq*X)
 //
 //  ARGUMENTS:
 //     none.
 //
 //  RETURNS:
-//     none.
+//     Capacitance value in x10 pf .
 //
 //-----------------------------------------------------------------------------
 WORD Calculate_C (WORD wX, DWORD dwFreq)
@@ -252,7 +249,10 @@ WORD Calculate_C (WORD wX, DWORD dwFreq)
 		return 0;
 	if (wX == -1)
 		return -1;
-	return (DWORD)100/((DWORD)628*dwFreq*(DWORD)wX);
+
+	dwFreq /= 1000;		//Hz to Khz
+
+	return ((DWORD)10000/63) * 	((DWORD)10000/dwFreq) * ((DWORD)10000/(wX*10));
 }
 
 

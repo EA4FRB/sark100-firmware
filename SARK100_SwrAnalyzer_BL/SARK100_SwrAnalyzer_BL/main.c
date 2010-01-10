@@ -1,27 +1,27 @@
 //*****************************************************************************/
-//  This file is a part of the "EA4FRB SWR Analyzer firmware"
+//  This file is a part of the "SARK100 SWR Analyzer firmware"
 //
 //  Copyright © 2010 Melchor Varela - EA4FRB.  All rights reserved.
 //  Melchor Varela, Madrid, Spain.
 //  melchor.varela@gmail.com
 //
-//  "EA4FRB SWR Analyzer firmware" is free software: you can redistribute it 
-//  and/or modify it under the terms of the GNU General Public License as 
-//  published by the Free Software Foundation, either version 3 of the License, 
+//  "SARK100 SWR Analyzer firmware" is free software: you can redistribute it
+//  and/or modify it under the terms of the GNU General Public License as
+//  published by the Free Software Foundation, either version 3 of the License,
 //  or (at your option) any later version.
 //
-//  "EA4FRB SWR Analyzer firmware" is distributed in the hope that it will be 
+//  "SARK100 SWR Analyzer firmware" is distributed in the hope that it will be
 //  useful,  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with "EA4FRB SWR Analyzer firmware".  If not, 
+//  along with "SARK100 SWR Analyzer firmware".  If not,
 //  see <http://www.gnu.org/licenses/>.
 //*****************************************************************************/
 //*****************************************************************************/
 //
-//	PROJECT:	SWR Analyzer
+//	PROJECT:	SARK100 SWR Analyzer
 // 	FILE NAME: 	MAIN.C
 // 	AUTHOR:		EA4FRB - Melchor Varela
 //
@@ -194,7 +194,7 @@ void main()
 		KEYPAD_WaitKey(TIME_WAIT_KEY_S);
 		DISP_Clear();
 	}
-	
+
 	do
 	{
 		// Display mode and frequency
@@ -597,7 +597,7 @@ static void Mode_Config (void)
 	BYTE bMenu = 0;
 	BYTE bKey;
 	BYTE bStep;
-	
+
 	do
 	{
 		DISP_Clear();
@@ -622,7 +622,7 @@ static void Mode_Config (void)
 				case CONFIG_PCLINK:
 					PcLink();
 					break;
-					
+
 				case CONFIG_STEP:
 					bStep = g_xConf.bStep;
 					do
@@ -646,10 +646,10 @@ static void Mode_Config (void)
 						{
 							g_xConf.bStep = bStep;
 							STR_SaveConfig();
-						}						
+						}
 					} while(TRUE);
 					break;
-					
+
 				case CONFIG_CALIB:
 					LCD_Position(1, 0);
 					LCD_PrCString(gConfirmStr);
@@ -657,7 +657,7 @@ static void Mode_Config (void)
 					if (KEYPAD_WaitKey(TIME_WAIT_KEY_S) == KBD_DWN)
 						Calibrate_Reflectometer();
 					break;
-					
+
 				case CONFIG_SW_LOAD:
 					LCD_Position(1, 0);
 					LCD_PrCString(gConfirmStr);
@@ -668,7 +668,7 @@ static void Mode_Config (void)
 						LCD_Position(0, 0);
 						LCD_PrCString(gSwLoadingStr);
 						M8C_Reset;		// Perform Software Reset by Supervisory Call
-					}	
+					}
 					break;
 			}
 		}

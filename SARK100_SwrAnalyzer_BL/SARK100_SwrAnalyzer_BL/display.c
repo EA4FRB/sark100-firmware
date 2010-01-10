@@ -1,27 +1,27 @@
 //*****************************************************************************/
-//  This file is a part of the "EA4FRB SWR Analyzer firmware"
+//  This file is a part of the "SARK100 SWR Analyzer firmware"
 //
 //  Copyright © 2010 Melchor Varela - EA4FRB.  All rights reserved.
 //  Melchor Varela, Madrid, Spain.
 //  melchor.varela@gmail.com
 //
-//  "EA4FRB SWR Analyzer firmware" is free software: you can redistribute it 
-//  and/or modify it under the terms of the GNU General Public License as 
-//  published by the Free Software Foundation, either version 3 of the License, 
+//  "SARK100 SWR Analyzer firmware" is free software: you can redistribute it
+//  and/or modify it under the terms of the GNU General Public License as
+//  published by the Free Software Foundation, either version 3 of the License,
 //  or (at your option) any later version.
 //
-//  "EA4FRB SWR Analyzer firmware" is distributed in the hope that it will be 
+//  "SARK100 SWR Analyzer firmware" is distributed in the hope that it will be
 //  useful,  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with "EA4FRB SWR Analyzer firmware".  If not, 
+//  along with "SARK100 SWR Analyzer firmware".  If not,
 //  see <http://www.gnu.org/licenses/>.
 //*****************************************************************************/
 //*****************************************************************************/
 //
-//	PROJECT:	SWR Analyzer
+//	PROJECT:	SARK100 SWR Analyzer
 // 	FILE NAME: 	DISPLAY.C
 // 	AUTHOR:		Melchor Varela
 //
@@ -158,7 +158,7 @@ void DISP_Frequency ( DWORD dwFreq )
 	char szFreq[9];
 	char szText[11];
 	int ii, jj;
-	
+
 	ultoa(szFreq, dwFreq, 10);
 	szText[10] = 0;
 	for (ii=strlen(szFreq)-1, jj=9;ii>=0;ii--,jj--)
@@ -166,7 +166,7 @@ void DISP_Frequency ( DWORD dwFreq )
 		szText[jj] = szFreq[ii];
 		if ((jj==7) && (ii!=0))
 			szText[--jj] = '.';
-		else if ((jj==3) && (ii!=0))	
+		else if ((jj==3) && (ii!=0))
 			szText[--jj] = ',';
 	}
 	for (;jj!=-1; jj--)
@@ -223,7 +223,7 @@ void DISP_Swr ( WORD wSwr )
 void DISP_ImpedanceComplex ( WORD wR, WORD wX, BYTE bIsPositive )
 {
 	char szText[16];
-	
+
 	if (wR==-1 || wX==-1)
 	{
 		LCD_PrCString(gErrorOverflowStr);
@@ -232,14 +232,14 @@ void DISP_ImpedanceComplex ( WORD wR, WORD wX, BYTE bIsPositive )
 	if (wR>10000)
 	{
 		itoa(szText, wR/1000, 10);
-		LCD_PrString(szText);	
+		LCD_PrString(szText);
 		LCD_Write_Data( 'K' );
-	}	
+	}
 	else
 	{
 		itoa(szText, wR, 10);
-		LCD_PrString(szText);	
-	}		
+		LCD_PrString(szText);
+	}
 	if (bIsPositive)
 		LCD_PrCString("+j");
 	else
@@ -247,14 +247,14 @@ void DISP_ImpedanceComplex ( WORD wR, WORD wX, BYTE bIsPositive )
 	if (wX>10000)
 	{
 		itoa(szText, wX/1000, 10);
-		LCD_PrString(szText);	
+		LCD_PrString(szText);
 		LCD_Write_Data( 'K' );
-	}	
+	}
 	else
 	{
 		itoa(szText, wX, 10);
-		LCD_PrString(szText);	
-	}		
+		LCD_PrString(szText);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -283,10 +283,13 @@ void DISP_Capacitance ( WORD wC )
 	}
 	else
 	{
-		itoa(szC, wC, 10);
+		itoa(szC, wC/10, 10);
+		LCD_PrString(szC);
+		LCD_Write_Data( '.' );
+		itoa(szC, wC%10, 10);
 		LCD_PrString(szC);
 		LCD_PrCString("pF");
-	}		
+	}
 }
 
 
@@ -316,10 +319,13 @@ void DISP_Inductance ( WORD wL )
 	}
 	else
 	{
-		itoa(szL, wL, 10);
+		itoa(szL, wL/10, 10);
+		LCD_PrString(szL);
+		LCD_Write_Data( '.' );
+		itoa(szL, wL%10, 10);
 		LCD_PrString(szL);
 		LCD_PrCString("uH");
-	}		
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -351,7 +357,7 @@ void DISP_Impedance ( WORD wZ )
 		itoa(szZ, wZ, 10);
 		LCD_PrString(szZ);
 		LCD_PrCString(" \xf4");
-	}		
+	}
 }
 
 //-----------------------------------------------------------------------------

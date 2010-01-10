@@ -1,3 +1,40 @@
+//*****************************************************************************/
+//  This file is a part of the "SARK100 SWR Analyzer firmware"
+//
+//  Copyright © 2010 Melchor Varela - EA4FRB.  All rights reserved.
+//  Melchor Varela, Madrid, Spain.
+//  melchor.varela@gmail.com
+//
+//  "SARK100 SWR Analyzer firmware" is free software: you can redistribute it
+//  and/or modify it under the terms of the GNU General Public License as
+//  published by the Free Software Foundation, either version 3 of the License,
+//  or (at your option) any later version.
+//
+//  "SARK100 SWR Analyzer firmware" is distributed in the hope that it will be
+//  useful,  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with "SARK100 SWR Analyzer firmware".  If not,
+//  see <http://www.gnu.org/licenses/>.
+//*****************************************************************************/
+//*****************************************************************************/
+//
+//	PROJECT:	SARK100 SWR Analyzer
+// 	FILE NAME: 	BOOTLOADER.C
+// 	AUTHOR:		EA4FRB - Melchor Varela
+//
+// 	DESCRIPTION
+//
+//
+// 	HISTORY
+//
+//	NAME   	DATE		REMARKS
+//
+//	MVM	   	DEC 2009	Creation
+//
+//*****************************************************************************/
 #include <m8c.h>        // part specific constants and macros
 #include "bootloader.h"    // API definitions for all BootLoader Modules
 #include <FlashBlock.h>
@@ -24,7 +61,7 @@ extern char FlashCheckSum(int);
 extern char Boot_Is_Program_Good(void);
 
 char Boot_ASCIItoBYTE(char Low,char High){
-    char byte; 
+    char byte;
 	if (High>='a') byte=(High-'a'+10)<<4; else byte=(High-'0')<<4;
 	if (Low>='a') byte|=(Low-'a'+10); else byte|=(Low-'0');
 	return byte;
@@ -38,7 +75,7 @@ BYTE Boot_UART_cGetChar(void){
 
 void Boot_UART_PutChar(char TxData){
 	while (!(Boot_TxD_bReadTxStatus() & TX8_TX_BUFFER_EMPTY));
-	Boot_TxD_SendData(TxData);     
+	Boot_TxD_SendData(TxData);
 }
 
 void Boot_UART_CPutString(char* pstr){
@@ -62,18 +99,18 @@ void Boot_PerformWrite(){
        while ((ch=Boot_UART_cGetChar())!='S'); // waiting for start symbol 'S'
 	   if ((ch = Boot_UART_cGetChar())=='S') break; // All blocks are sent ?
 	      else {
-		    cl=Boot_UART_cGetChar();       
+		    cl=Boot_UART_cGetChar();
 	        data[0]=Boot_ASCIItoBYTE(cl,ch);
-	      } 
+	      }
 	   for (i=1; i<68; i++) {
 	      ch=Boot_UART_cGetChar();  // Read high nibble
-	      cl=Boot_UART_cGetChar();  // Read low nibble 
+	      cl=Boot_UART_cGetChar();  // Read low nibble
 	      data[i]=Boot_ASCIItoBYTE(cl,ch);  // Write transformed byte in buffer
-	   } 
-	   
+	   }
+
 	   // Read Last Block Symbol 'F'
 	   if ((ch=Boot_UART_cGetChar())!='F') ; // Error Info!
-	   
+
 	   // Write Block to Flash
 	   fwStruct.wARG_BlockId = (((int)data[1])<<2) + (data[2]>>6); // Form Block ID form Block Address
 	   fwStruct.pARG_FlashBuffer = data+4;	// Data start Address
@@ -83,7 +120,7 @@ void Boot_PerformWrite(){
 	   // Read back Block
 	   frStruct.wARG_BlockId = fwStruct.wARG_BlockId;	// Read back the same block
 	   frStruct.pARG_FlashBuffer = data+4;  // Buffer Address
-	   frStruct.wARG_ReadCount = 64;		// Read 64 bytes 
+	   frStruct.wARG_ReadCount = 64;		// Read 64 bytes
 	   FlashReadBlock(&frStruct);			// Read Block
 
 	   // Sending Back Written Block for Analyzing
@@ -97,23 +134,23 @@ void Boot_PerformWrite(){
 	      Boot_UART_PutChar(cl);		// Send Low Nibble
 	   }
 	   Boot_UART_PutChar('F');	   // Last frame Symbol
-	}	
-	
+	}
+
 	if (LastBlock_To_Check==0) return;	// Don't calculate a checksum
 	BlockID = 456;	// first block where checksum is saved (blocks of CheckSum Area:456,457,458,459,460,461,462,463)
-	// Calculate CheckSum and Write It In Flash	
+	// Calculate CheckSum and Write It In Flash
 	for (j=1;j<=LastBlock_To_Check;j++){
 		if ((j&0x3F)==0) {
- 		  fwStruct.wARG_BlockId = BlockID;       // Block ID 
+ 		  fwStruct.wARG_BlockId = BlockID;       // Block ID
 	      fwStruct.pARG_FlashBuffer = data;  	// Data start Address
 	      fwStruct.cARG_Temperature = 25;		// Temperature in Celsius
 	      bFlashWriteBlock(&fwStruct);			// Write Block
  		  BlockID++;							// Increment Block ID
-		}  
+		}
 		data[j&0x3F] = FlashCheckSum(j);		// data[i%64] <- CheckSum of i-th block
     }
-    
-    fwStruct.wARG_BlockId = BlockID;         // Block ID 
+
+    fwStruct.wARG_BlockId = BlockID;         // Block ID
     fwStruct.pARG_FlashBuffer = data;  	// Data start Address
     fwStruct.cARG_Temperature = 25;		// Temperature in Celsius
 
@@ -125,7 +162,7 @@ void Boot_PerformWrite(){
     data[62]=(char)(LastBlock_To_Check>>8);	// Save last block to check (MSB)
     data[63]=(char)LastBlock_To_Check;		// Save last block to check (LSB)
 
-    fwStruct.wARG_BlockId = BlockID;         // Block ID     
+    fwStruct.wARG_BlockId = BlockID;         // Block ID
     fwStruct.pARG_FlashBuffer = data;  	// Data start Address
     fwStruct.cARG_Temperature = 25;		// Temperature in Celsius
     bFlashWriteBlock(&fwStruct);		// Write Block
@@ -134,7 +171,7 @@ void Boot_PerformWrite(){
 void BootLoader(){
 //    long int x;
 //    char z;
-	int j;    	
+	int j;
 	char buffer[10];
 	char Error,i,k;
 	char CheckSum;
@@ -171,14 +208,14 @@ void BootLoader(){
 	       if (k==3) {
 	         Boot_UART_CPutString(strAnswer);	// send back strAnswer to establish connection
       	     Boot_PerformWrite();			// reprogram Flash
-    	     M8C_Reset;						// Perform Software Reset by Supervisory Call      	   
-	       }  
+    	     M8C_Reset;						// Perform Software Reset by Supervisory Call
+	       }
       	};
       	Boot_Counter_Stop();				// Stop Counter
 	}
 #endif
 
-	// Control if a BoootLoader Program is correct 
+	// Control if a BoootLoader Program is correct
 	Error=0;
 	if (!Boot_Is_Program_Good()) Error=1;
 	// Control CheckSum if needed
@@ -186,16 +223,16 @@ void BootLoader(){
       for (j=1;j<=LastBlock_To_Check;j++){
          CheckSum=BootCheckSumBlock[j];
          if (CheckSum!=FlashCheckSum(j)) Error=1;	// Set CheckSum Error Flag
-      }  
-    }  
+      }
+    }
     // Check button to enter bootloader mode
 //    SETBUTTON();		// pull up for Button
-//    if (!GETBUTTON()) 
+//    if (!GETBUTTON())
       if (!Error) asm("ljmp __Start");	// if button not pressed - Start Firmwire
-			
+
     // Here it communicates with PC and then starts programming
 //	BOOTLOADER_MODE_LED_ON();		// light on LED when entered BootLoader Mode
-		
+
  	// Connect with PC Terminal Program
 	Error=1;
 	// Set Communication here
@@ -203,27 +240,27 @@ void BootLoader(){
 	 	Error=0;
 	 	for (i=0;i<7; i++) {
 	 	  buffer[i]=Boot_UART_cGetChar();
-	 	  if (buffer[i]!=*(strConnect+i)) { 
+	 	  if (buffer[i]!=*(strConnect+i)) {
 	 	       Error=1;
 	 	       break;
 	 	  }
 	 	}
 	 	if (Error) continue;
-	
+
 	    // Send Back Annswer - "Ok!"
       	Boot_UART_CPutString(strAnswer);
     	// Get Answer back -"Ok!"
     	for (i=0;i<3; i++) {
 	 	  buffer[i]=Boot_UART_cGetChar();
-	 	  if (buffer[i]!=*(strAnswer+i)) { 
+	 	  if (buffer[i]!=*(strAnswer+i)) {
 	 	       Error=1;
 	 	       break;
 	 	  }
 	 	}
 	}
-	
+
 	// Waiting for blocks to be written
 	Boot_PerformWrite();
-	
+
 	M8C_Reset;		// Perform Software Reset by Supervisory Call
 }
