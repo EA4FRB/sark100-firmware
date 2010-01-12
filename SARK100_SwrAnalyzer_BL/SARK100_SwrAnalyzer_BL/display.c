@@ -27,6 +27,7 @@
 //
 // 	DESCRIPTION
 //
+//	Display utility functions
 //
 // 	HISTORY
 //
@@ -147,7 +148,7 @@ static void Configure_CG_Bitmap ( BYTE bitmapId, BYTE const *bitmapPtr  )
 //	Display VFO frequency in the current cursor position
 //
 //  ARGUMENTS:
-//    freq : frequency in hertz
+//    dwFreq 	Frequency in hertz
 //
 //  RETURNS:
 //    none.
@@ -181,10 +182,10 @@ void DISP_Frequency ( DWORD dwFreq )
 //
 //  DESCRIPTION:
 //
-//
+//	Display SWR value
 //
 //  ARGUMENTS:
-//
+//		wSwr	SWR value
 //
 //  RETURNS:
 //    none.
@@ -211,10 +212,12 @@ void DISP_Swr ( WORD wSwr )
 //
 //  DESCRIPTION:
 //
-//
+//	Display impedance
 //
 //  ARGUMENTS:
-//
+//		wR			Resistance
+//		wX			Reactance
+//		bIsPostive	TRUE if reactance is positive (indcutive)
 //
 //  RETURNS:
 //    none.
@@ -262,16 +265,15 @@ void DISP_ImpedanceComplex ( WORD wR, WORD wX, BYTE bIsPositive )
 //
 //  DESCRIPTION:
 //
-//
+//	Display capacitance
 //
 //  ARGUMENTS:
-//
+//		wC		Capacitance in 10xpF
 //
 //  RETURNS:
 //    none.
 //
 //-----------------------------------------------------------------------------
-//@TODO: Improve presentation: decimals, etc
 void DISP_Capacitance ( WORD wC )
 {
 	char szC[16];
@@ -292,22 +294,20 @@ void DISP_Capacitance ( WORD wC )
 	}
 }
 
-
 //-----------------------------------------------------------------------------
 //  FUNCTION NAME: DISP_Inductance
 //
 //  DESCRIPTION:
 //
-//
+//	Display inductance
 //
 //  ARGUMENTS:
-//
+//		wL		Inductance in 10xuH
 //
 //  RETURNS:
 //    none.
 //
 //-----------------------------------------------------------------------------
-//@TODO: Improve presentation: decimals, etc
 void DISP_Inductance ( WORD wL )
 {
 	char szL[16];
@@ -333,16 +333,15 @@ void DISP_Inductance ( WORD wL )
 //
 //  DESCRIPTION:
 //
-//
+//	Displays impedance modulus
 //
 //  ARGUMENTS:
-//
+//		wZ		Impedance modulus
 //
 //  RETURNS:
 //    none.
 //
 //-----------------------------------------------------------------------------
-//@TODO: Improve presentation: decimals, etc
 void DISP_Impedance ( WORD wZ )
 {
 	char szZ[16];
@@ -365,7 +364,7 @@ void DISP_Impedance ( WORD wZ )
 //
 //  DESCRIPTION:
 //
-//
+//	Clears the screen
 //
 //  ARGUMENTS:
 //

@@ -82,10 +82,11 @@ static WORD Calc_Sqrt (DWORD dwN);
 //	SWR = (Vf+Vr/Vf-Vr)*100
 //
 //  ARGUMENTS:
-//     none.
+//     	dwVf
+//		dwVr
 //
 //  RETURNS:
-//     none.
+//     SWR
 //
 //-----------------------------------------------------------------------------
 WORD Calculate_Swr (DWORD dwVf, DWORD dwVr)
@@ -98,12 +99,13 @@ WORD Calculate_Swr (DWORD dwVf, DWORD dwVr)
 	else if (dwVr>dwVf)
 		dwDenominator = dwVr-dwVf;
 	else
-		return (WORD) -1;		//Error
+		return (WORD) -1;				// Error
 
 	dwNumerator = (dwVf+dwVr)*100;
 
 	return (dwNumerator/dwDenominator);
 }
+
 //-----------------------------------------------------------------------------
 //  FUNCTION NAME:	Calculate_Z
 //
@@ -114,10 +116,12 @@ WORD Calculate_Swr (DWORD dwVf, DWORD dwVr)
 //	Z = (50 * Vz)/Va;
 //
 //  ARGUMENTS:
-//     none.
+//  	wSwr
+//		dwVz
+//		dwVa
 //
 //  RETURNS:
-//     none.
+//     Z
 //
 //-----------------------------------------------------------------------------
 WORD Calculate_Z (WORD wSwr, DWORD dwVz, DWORD dwVa)
@@ -125,7 +129,7 @@ WORD Calculate_Z (WORD wSwr, DWORD dwVz, DWORD dwVa)
 	if (wSwr>999)
 		return -1;
 
-	if (dwVa == 0)			// Avoids divide by zero
+	if (dwVa == 0)						// Avoids divide by zero
 		return (WORD)-1;
 
 	return ((DWORD)(dwVz * (DWORD)50))/dwVa;
@@ -143,10 +147,11 @@ WORD Calculate_Z (WORD wSwr, DWORD dwVz, DWORD dwVa)
 //                50 * (SWR^2 + 1)
 //
 //  ARGUMENTS:
-//     none.
+//     wZ
+//		wSwr
 //
 //  RETURNS:
-//     none.
+//     R
 //
 //-----------------------------------------------------------------------------
 WORD Calculate_R (WORD wZ, WORD wSwr)
@@ -163,7 +168,7 @@ WORD Calculate_R (WORD wZ, WORD wSwr)
 		return -1;
 	}
 	dwDenominator = (((DWORD)wSwr*wSwr)/2)+5000;
-	if (dwDenominator == 0)	//Avoids divide by zero
+	if (dwDenominator == 0)				// Avoids divide by zero
 		return (WORD)-1;
 	dwNumerator = (((DWORD)wZ*wZ) + 2500) * (DWORD)wSwr;
 
@@ -180,10 +185,11 @@ WORD Calculate_R (WORD wZ, WORD wSwr)
 //           X = SQRT ( Z_squared - R_squared )
 //
 //  ARGUMENTS:
-//     none.
+//     	wZ
+//		wR
 //
 //  RETURNS:
-//     none.
+//     X
 //
 //-----------------------------------------------------------------------------
 WORD Calculate_X (WORD wZ, WORD wR)
@@ -195,6 +201,7 @@ WORD Calculate_X (WORD wZ, WORD wR)
 	dwTemp = ((DWORD)wZ*wZ)-((DWORD)wR*wR);
 	if ((signed long)dwTemp<0)
 		return 0;
+
 	return Calc_Sqrt(dwTemp);
 }
 
@@ -208,7 +215,8 @@ WORD Calculate_X (WORD wZ, WORD wR)
 //   	L=10^6*X/2*PI*freq
 //
 //  ARGUMENTS:
-//     none.
+//     	wX
+//		dwFreq
 //
 //  RETURNS:
 //     Inductance value in *10 uH.
@@ -221,7 +229,7 @@ WORD Calculate_L (WORD wX, DWORD dwFreq)
 	if (wX == -1)
 		return -1;
 
-	dwFreq /= 1000;		//Hz to Khz
+	dwFreq /= 1000;						// Hz to Khz
 
 	dwTemp = ((DWORD)wX*100000)/628;
 	return dwTemp / dwFreq;
@@ -237,7 +245,8 @@ WORD Calculate_L (WORD wX, DWORD dwFreq)
 //           C=10^12/(2*PI*freq*X)
 //
 //  ARGUMENTS:
-//     none.
+//     	wX
+//		dwFreq
 //
 //  RETURNS:
 //     Capacitance value in x10 pf .
@@ -255,7 +264,6 @@ WORD Calculate_C (WORD wX, DWORD dwFreq)
 	return ((DWORD)10000/63) * 	((DWORD)10000/dwFreq) * ((DWORD)10000/(wX*10));
 }
 
-
 //-----------------------------------------------------------------------------
 //  FUNCTION NAME:	Calc_Sqrt
 //
@@ -264,10 +272,10 @@ WORD Calculate_C (WORD wX, DWORD dwFreq)
 //	Calculates square root fo integer number
 //
 //  ARGUMENTS:
-//     none.
+//     dwN		Value to calculate
 //
 //  RETURNS:
-//     none.
+//     Square root
 //
 //-----------------------------------------------------------------------------
 static WORD Calc_Sqrt (DWORD dwN)
@@ -295,23 +303,9 @@ static WORD Calc_Sqrt (DWORD dwN)
 	return (WORD)(dwRoot>>1);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 #if 0	// Test data sets
-//-----------------------------------------------------------------------------
-//  FUNCTION NAME:	Calculate_C
-//
-//  DESCRIPTION:
-//
-//	Calculates capacitance
-//
-//           C=1/(6.28*freq*X)
-//
-//  ARGUMENTS:
-//     none.
-//
-//  RETURNS:
-//     none.
-//
-//-----------------------------------------------------------------------------
 void Do_Test_Calcs ( void )
 {
 	//100 Ohm
@@ -435,6 +429,4 @@ void Do_Test_Calcs ( void )
 	wC = Calculate_C(wX, dwCurrentFreq);
 	wL = Calculate_L(wX, dwCurrentFreq);
 }
-
-
 #endif

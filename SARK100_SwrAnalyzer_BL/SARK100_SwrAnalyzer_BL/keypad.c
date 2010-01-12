@@ -5,18 +5,18 @@
 //  Melchor Varela, Madrid, Spain.
 //  melchor.varela@gmail.com
 //
-//  "SARK100 SWR Analyzer firmware" is free software: you can redistribute it 
-//  and/or modify it under the terms of the GNU General Public License as 
-//  published by the Free Software Foundation, either version 3 of the License, 
+//  "SARK100 SWR Analyzer firmware" is free software: you can redistribute it
+//  and/or modify it under the terms of the GNU General Public License as
+//  published by the Free Software Foundation, either version 3 of the License,
 //  or (at your option) any later version.
 //
-//  "SARK100 SWR Analyzer firmware" is distributed in the hope that it will be 
+//  "SARK100 SWR Analyzer firmware" is distributed in the hope that it will be
 //  useful,  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with "SARK100 SWR Analyzer firmware".  If not, 
+//  along with "SARK100 SWR Analyzer firmware".  If not,
 //  see <http://www.gnu.org/licenses/>.
 //*****************************************************************************/
 //*****************************************************************************/
@@ -27,6 +27,7 @@
 //
 // 	DESCRIPTION
 //
+//	Keypad driver
 //
 // 	HISTORY
 //
@@ -36,8 +37,8 @@
 //
 //*****************************************************************************/
 
-#include <m8c.h>        // part specific constants and macros
-#include "PSoCAPI.h"    // PSoC API definitions for all User Modules
+#include <m8c.h>        				// Part specific constants and macros
+#include "PSoCAPI.h"    				// PSoC API definitions for all User Modules
 #include "psocgpioint.h"
 
 #include "keypad.h"
@@ -46,20 +47,10 @@
 #include "util.h"
 
 //-----------------------------------------------------------------------------
-//  Macros
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
 //  Defines
 //-----------------------------------------------------------------------------
-#define KEY_DEBOUNCE_TIME		2	// Units of 1/8 sec
+#define KEY_DEBOUNCE_TIME		2		// Units of 1/8 sec
 
-//-----------------------------------------------------------------------------
-//  Public data:
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//  Private data:
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 //  Prototypes
 //-----------------------------------------------------------------------------
@@ -70,7 +61,7 @@ static BYTE KEYPAD_Scan ( void );
 //
 //  DESCRIPTION:
 //
-//	Scans keypad
+//	Get key pressed value
 //
 //  ARGUMENTS:
 //    none.
@@ -85,17 +76,17 @@ BYTE KEYPAD_Get ( void )
 
 	if (g_bDebounceCounter!=0)
 		return 0;
-		
+
 	bKey = KEYPAD_Scan();
 	if (bKey != KEYPAD_Scan())
 		bKey = 0;
-	
-	if (bKey) 
+
+	if (bKey)
 	{
 		BUZZ_KeyClick();
 		g_bDebounceCounter = KEY_DEBOUNCE_TIME;
 	}
-	return bKey;	
+	return bKey;
 }
 
 //-----------------------------------------------------------------------------
@@ -103,18 +94,19 @@ BYTE KEYPAD_Get ( void )
 //
 //  DESCRIPTION:
 //
+//	Waits for key or delay
 //
 //  ARGUMENTS:
-//    none.
+//    bDelayS	Wait timeout in seconds
 //
 //  RETURNS:
-//    Key pressed. 
+//    Key pressed.
 //
 //-----------------------------------------------------------------------------
 BYTE KEYPAD_WaitKey ( BYTE bDelayS )
 {
 	BYTE bKey;
-	
+
 	g_bIddleCounter = bDelayS;
 	do
 	{
@@ -126,12 +118,12 @@ BYTE KEYPAD_WaitKey ( BYTE bDelayS )
 				break;
 		}
 	} while (bKey == 0);
-	
+
 	return bKey;
-}	
+}
 
 //-----------------------------------------------------------------------------
-//  FUNCTION NAME:	KEYPAD_Get
+//  FUNCTION NAME:	KEYPAD_Scan
 //
 //  DESCRIPTION:
 //
@@ -147,7 +139,7 @@ BYTE KEYPAD_WaitKey ( BYTE bDelayS )
 static BYTE KEYPAD_Scan ( void )
 {
 	BYTE bKey = 0;
-	
+
 	COL0_Data_ADDR |= COL0_MASK;
 	COL1_Data_ADDR |= COL1_MASK;
 	COL2_Data_ADDR |= COL2_MASK;

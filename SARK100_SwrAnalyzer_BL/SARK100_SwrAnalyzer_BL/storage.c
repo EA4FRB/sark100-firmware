@@ -5,18 +5,18 @@
 //  Melchor Varela, Madrid, Spain.
 //  melchor.varela@gmail.com
 //
-//  "SARK100 SWR Analyzer firmware" is free software: you can redistribute it 
-//  and/or modify it under the terms of the GNU General Public License as 
-//  published by the Free Software Foundation, either version 3 of the License, 
+//  "SARK100 SWR Analyzer firmware" is free software: you can redistribute it
+//  and/or modify it under the terms of the GNU General Public License as
+//  published by the Free Software Foundation, either version 3 of the License,
 //  or (at your option) any later version.
 //
-//  "SARK100 SWR Analyzer firmware" is distributed in the hope that it will be 
+//  "SARK100 SWR Analyzer firmware" is distributed in the hope that it will be
 //  useful,  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with "SARK100 SWR Analyzer firmware".  If not, 
+//  along with "SARK100 SWR Analyzer firmware".  If not,
 //  see <http://www.gnu.org/licenses/>.
 //*****************************************************************************/
 //*****************************************************************************/
@@ -27,6 +27,7 @@
 //
 // 	DESCRIPTION
 //
+//	EEPROM storage functions
 //
 // 	HISTORY
 //
@@ -56,41 +57,27 @@
 //-----------------------------------------------------------------------------
 //  Typedefs
 //-----------------------------------------------------------------------------
-typedef struct
+typedef struct							// Structure stored in EEPROM
 {
-	// Calibration data
-	BRIDGE_VOLTAGES xBandCorrFactor[BAND_MAX];	
-	BYTE bGainDDS[BAND_MAX];	
+										// Calibration data
+	BRIDGE_VOLTAGES xBandCorrFactor[BAND_MAX];
+	BYTE bGainDDS[BAND_MAX];
 	BRIDGE_VOLTAGES xBridgeOffset;
 	BYTE bIsCalibrated;
-	
-	// Configuration data
+
+										// Configuration data
 	CONFIG_DATA xConf;
-	
-	// Integrity control
+
+										// Integrity control
 	WORD wMagic;
 } RECORD_DATA;
-
-//-----------------------------------------------------------------------------
-//  Public data:
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-//  Externals
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-//  Private data:
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//  Prototypes
-//-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 //  FUNCTION NAME:	STR_SaveCalibration
 //
 //  DESCRIPTION:
 //
+//	Save calibration data in EEPROM
 //
 //  ARGUMENTS:
 //     none.
@@ -112,6 +99,7 @@ void STR_SaveCalibration ( void )
 //
 //  DESCRIPTION:
 //
+//	Save configuration data
 //
 //  ARGUMENTS:
 //     none.
@@ -125,10 +113,11 @@ void STR_SaveConfig ( void )
 	E2PROM_bE2Write(offsetof(RECORD_DATA,xConf), (unsigned char*)&g_xConf, sizeof(g_xConf), 25);
 }
 //-----------------------------------------------------------------------------
-//  FUNCTION NAME:	
+//  FUNCTION NAME:	STR_Restore
 //
 //  DESCRIPTION:
 //
+//	Restores EEPROM data. In case of not initialized set defaults
 //
 //  ARGUMENTS:
 //     none.
@@ -142,29 +131,29 @@ void STR_Restore ( void )
 	WORD magic;
 	BYTE bBand;
 	CHAR cRc;
-	
+
 	E2PROM_E2Read(offsetof(RECORD_DATA,wMagic), (unsigned char*) &magic, sizeof(WORD));
 	if (magic != MAGIC_NUMBER)
 	{
-		// Set defaults
+										// Set defaults
 		for (bBand=0;bBand<BAND_MAX;bBand++)
 		{
 			g_xBandCorrFactor[bBand].Vz = 100;
-			g_xBandCorrFactor[bBand].Vr = 100; 
-			g_xBandCorrFactor[bBand].Va = 100; 
+			g_xBandCorrFactor[bBand].Vr = 100;
+			g_xBandCorrFactor[bBand].Va = 100;
 			g_xBandCorrFactor[bBand].Vf = 100;
-			
+
 			g_bGainDDS[bBand] = g_bDefGainDdsIdx[bBand];
-		}		
+		}
 		g_xBridgeOffset.Vf = 0;
 		g_xBridgeOffset.Vr = 0;
 		g_xBridgeOffset.Vz = 0;
 		g_xBridgeOffset.Va = 0;
-		
+
 		g_bIsCalibrated = FALSE;
-		
+
 		STR_SaveCalibration();
-				
+
 		g_xConf.bStep = STEP_10KHZ;
 		STR_SaveConfig();
 

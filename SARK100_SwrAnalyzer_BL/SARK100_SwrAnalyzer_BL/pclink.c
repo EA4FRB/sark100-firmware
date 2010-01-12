@@ -5,18 +5,18 @@
 //  Melchor Varela, Madrid, Spain.
 //  melchor.varela@gmail.com
 //
-//  "SARK100 SWR Analyzer firmware" is free software: you can redistribute it 
-//  and/or modify it under the terms of the GNU General Public License as 
-//  published by the Free Software Foundation, either version 3 of the License, 
+//  "SARK100 SWR Analyzer firmware" is free software: you can redistribute it
+//  and/or modify it under the terms of the GNU General Public License as
+//  published by the Free Software Foundation, either version 3 of the License,
 //  or (at your option) any later version.
 //
-//  "SARK100 SWR Analyzer firmware" is distributed in the hope that it will be 
+//  "SARK100 SWR Analyzer firmware" is distributed in the hope that it will be
 //  useful,  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with "SARK100 SWR Analyzer firmware".  If not, 
+//  along with "SARK100 SWR Analyzer firmware".  If not,
 //  see <http://www.gnu.org/licenses/>.
 //*****************************************************************************/
 //*****************************************************************************/
@@ -27,6 +27,7 @@
 //
 // 	DESCRIPTION
 //
+//	PC link routines for update measurements
 //
 // 	HISTORY
 //
@@ -47,26 +48,6 @@
 #include "calcs.h"
 
 //-----------------------------------------------------------------------------
-//  Macros
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-//  Defines
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-//  Typedefs
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-//  Public data:
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-//  Externals
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
 //  Private data:
 //-----------------------------------------------------------------------------
 static BYTE const gszCmdOn		[] = "on";
@@ -75,7 +56,7 @@ static BYTE const gszCmdFreq	[] = "freq";
 static BYTE const gszCmdMeasImp	[] = "imp";
 static BYTE const gszCmdMeasRaw	[] = "raw";
 
-static BYTE const gszWelcome	[] = "\r\nEA4FRB SWR Analyzer V0.0 \r\n";
+static BYTE const gszWelcome	[] = "\r\nSARK100 SWR Analyzer V0.2 \r\n";
 static BYTE const gszCmdPrompt	[] = "\r\n>>";
 static BYTE const gszWaitLink	[] = "Waiting Link";
 static BYTE const gszOk			[] = "\r\nOK\r\n";
@@ -106,6 +87,7 @@ static BYTE GetBand (DWORD dwFreq);
 //
 //  DESCRIPTION:
 //
+//	PC link routines for update measurements
 //
 //  ARGUMENTS:
 //     none.
@@ -116,38 +98,37 @@ static BYTE GetBand (DWORD dwFreq);
 //-----------------------------------------------------------------------------
 void PcLink (void)
 {
-	char * strPtr; 					// Parameter pointer
+	char * strPtr; 						// Parameter pointer
 	DWORD dwCurrentFreq = -1;
 	BYTE szMsg[20];
 	BYTE bBand;
-	
-	UART_CmdReset(); 						// Initialize receiver/cmd
-											// buffer
-	UART_IntCntl(UART_ENABLE_RX_INT); 		// Enable RX interrupts
-	UART_Start(UART_PARITY_NONE); 			// Enable UART
-	
+
+	UART_CmdReset(); 					// Initialize receiver/cmd buffer
+	UART_IntCntl(UART_ENABLE_RX_INT); 	// Enable RX interrupts
+	UART_Start(UART_PARITY_NONE); 		// Enable UART
+
 	M8C_EnableGInt ;
-	
-    UART_PutChar(12); 												//Clear the screen
+
+    UART_PutChar(12); 					// Clear the screen
 	UART_CPutString(gszWelcome);
 	UART_CPutString(gszCmdPrompt);
 
 	LCD_Position(1, 0);
 	LCD_PrCString(gszWaitLink);
-	while(TRUE) 
+	while(TRUE)
 	{
 		if (KEYPAD_Get() == KBD_UP)
 			break;
 
-		if(UART_bCmdCheck()) 				// Wait for command
-		{ 
-			if(strPtr = UART_szGetParam()) // More than delimiter?
-			{ 
+		if(UART_bCmdCheck()) 			// Wait for command
+		{								// More than delimiter?
+			if(strPtr = UART_szGetParam())
+			{
 				LCD_Position(1, 0);
 				LCD_PrCString(gBlankStr);
 				LCD_Position(1, 0);
 				LCD_PrString(strPtr);
-    			if(!cstrcmp((const char*)gszCmdOn,(char*)strPtr)) 
+    			if(!cstrcmp((const char*)gszCmdOn,(char*)strPtr))
 				{
 					if (dwCurrentFreq==-1)
 					{
@@ -157,12 +138,12 @@ void PcLink (void)
 					DDS_Set(dwCurrentFreq);
 					UART_CPutString(gszOk);
 				}
-    			else if(!cstrcmp((const char*)gszCmdOff,(char*)strPtr)) 
+    			else if(!cstrcmp((const char*)gszCmdOff,(char*)strPtr))
 				{
 					DDS_Set(0);
 					UART_CPutString(gszOk);
 				}
-    			else if(!cstrcmp((const char*)gszCmdFreq,(char*)strPtr)) 
+    			else if(!cstrcmp((const char*)gszCmdFreq,(char*)strPtr))
 				{
 					do
 					{
@@ -182,16 +163,16 @@ void PcLink (void)
 						g_xBridgeCorrect = g_xBandCorrFactor[bBand];
 						Adjust_Dds_Gain(bBand);
 						UART_CPutString(gszOk);
-					} while (FALSE);	
+					} while (FALSE);
 				}
-    			else if(!cstrcmp((const char*)gszCmdMeasImp,(char*)strPtr)) 
+    			else if(!cstrcmp((const char*)gszCmdMeasImp,(char*)strPtr))
 				{
 					Do_Measure();
 					gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 					gwZ = Calculate_Z(gwSwr, g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 					gwR = Calculate_R(gwZ, gwSwr);
 					gwX = Calculate_X(gwZ, gwR);
-				
+
 					itoa(szMsg, gwSwr, 10);
 					UART_CPutString(gszSwr);
 					if (gwSwr>SWR_MAX)
@@ -202,7 +183,7 @@ void PcLink (void)
 					{
 						UART_PutString(szMsg);
 					}
-					
+
 					itoa(szMsg, gwZ, 10);
 					UART_CPutString(gszZ);
 					if (gwZ==-1)
@@ -213,7 +194,7 @@ void PcLink (void)
 					{
 						UART_PutString(szMsg);
 					}
-					
+
 					itoa(szMsg, gwR, 10);
 					UART_CPutString(gszR);
 					if (gwR==-1)
@@ -237,22 +218,22 @@ void PcLink (void)
 					}
 					UART_PutCRLF();
 				}
-    			else if(!cstrcmp((const char*)gszCmdMeasRaw,(char*)strPtr)) 
+    			else if(!cstrcmp((const char*)gszCmdMeasRaw,(char*)strPtr))
 				{
 					Do_Measure();
 
 					ltoa(szMsg, g_xBridgeMeasure.Vf/100, 10);
 					UART_CPutString(gszVf);
 					UART_PutString(szMsg);
-					
+
 					ltoa(szMsg, g_xBridgeMeasure.Vr/100, 10);
 					UART_CPutString(gszVr);
 					UART_PutString(szMsg);
-					
+
 					ltoa(szMsg, g_xBridgeMeasure.Vz/100, 10);
 					UART_CPutString(gszVz);
 					UART_PutString(szMsg);
-					
+
 					ltoa(szMsg, g_xBridgeMeasure.Va/100, 10);
 					UART_CPutString(gszVa);
 					UART_PutString(szMsg);
@@ -278,9 +259,10 @@ void PcLink (void)
 //
 //  DESCRIPTION:
 //
+//	Get band index for a given frequency
 //
 //  ARGUMENTS:
-//     none.
+//     dwFreq		Frequency in Hz
 //
 //  RETURNS:
 //     none.
@@ -289,7 +271,7 @@ void PcLink (void)
 static BYTE GetBand (DWORD dwFreq)
 {
 	BYTE bBand;
-	
+
 	for (bBand=0; bBand<BAND_MAX; bBand++)
 	{
 		if (dwFreq >= (g_xBandLimits[bBand].low*BAND_FREQ_MULT) &&
@@ -298,5 +280,6 @@ static BYTE GetBand (DWORD dwFreq)
 	}
 	if (bBand>=BAND_MAX)
 		return -1;
+
 	return bBand;
 }

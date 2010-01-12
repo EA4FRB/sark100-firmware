@@ -5,18 +5,18 @@
 //  Melchor Varela, Madrid, Spain.
 //  melchor.varela@gmail.com
 //
-//  "SARK100 SWR Analyzer firmware" is free software: you can redistribute it 
-//  and/or modify it under the terms of the GNU General Public License as 
-//  published by the Free Software Foundation, either version 3 of the License, 
+//  "SARK100 SWR Analyzer firmware" is free software: you can redistribute it
+//  and/or modify it under the terms of the GNU General Public License as
+//  published by the Free Software Foundation, either version 3 of the License,
 //  or (at your option) any later version.
 //
-//  "SARK100 SWR Analyzer firmware" is distributed in the hope that it will be 
+//  "SARK100 SWR Analyzer firmware" is distributed in the hope that it will be
 //  useful,  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with "SARK100 SWR Analyzer firmware".  If not, 
+//  along with "SARK100 SWR Analyzer firmware".  If not,
 //  see <http://www.gnu.org/licenses/>.
 //*****************************************************************************/
 //*****************************************************************************/
@@ -27,6 +27,7 @@
 //
 // 	DESCRIPTION
 //
+//	Display texts: English
 //
 // 	HISTORY
 //
@@ -41,19 +42,12 @@
 #include "glb_data.h"
 
 //-----------------------------------------------------------------------------
-//  Macros
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-//  Defines
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 //  Display texts:
 //-----------------------------------------------------------------------------
 BYTE const gBlankStr	[] = "                ";
 
-BYTE const gWelcome1Str	[] = "ANTENNA ANALYZER";
-BYTE const gWelcome2Str	[] = "(c)EA4FRB 10 V00";
+BYTE const gWelcome1Str	[] = "SARK100 ANALYZER";
+BYTE const gWelcome2Str	[] = "(c)EA4FRB 10 V02";
 
 BYTE const gConfigPcLinkStr	[] = "PC Link";
 BYTE const gConfigStepStr	[] = "Step Size";
@@ -147,34 +141,3 @@ BYTE const gBandLitStr			[] = "BAND:";
 
 BYTE const gSwLoadingStr		[] = "SW Loading";
 
-// 0123456789012345
-// SCAN  10,000.000
-// 9.99 45+j33
-
-// 0123456789012345
-// SWR   10,000.000
-// 3.4  45+j33
-
-// 0123456789012345
-// SWR   10,000.000
-// BAND 	   160M
-
-// 0123456789012345
-// VFO   10,000.000
-//
-
-// 0123456789012345
-// CAP   10,000.000
-// C = 120pF
-
-// 0123456789012345
-// IND   10,000.000
-// L = 2.2uH
-
-// 0123456789012345
-// OFF   10,000.000
-//
-
-
-//MODE: SWR,CAP,L, VF, OFF
-//BAND: 1-10Mhz, 10-20M, 20-30M

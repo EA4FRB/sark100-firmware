@@ -27,6 +27,7 @@
 //
 // 	DESCRIPTION
 //
+//	Bootloader main logic
 //
 // 	HISTORY
 //
@@ -35,8 +36,8 @@
 //	MVM	   	DEC 2009	Creation
 //
 //*****************************************************************************/
-#include <m8c.h>        // part specific constants and macros
-#include "bootloader.h"    // API definitions for all BootLoader Modules
+#include <m8c.h>        	// part specific constants and macros
+#include "bootloader.h"    	// API definitions for all BootLoader Modules
 #include <FlashBlock.h>
 
 #define LAST_BLOCK_TO_CHECK	0		// Minimum = 1; Maximum = 455; if 0 then don't calculate CS
