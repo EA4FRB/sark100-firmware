@@ -27,6 +27,7 @@
 //
 // 	DESCRIPTION
 //
+//	Main program logic
 //
 // 	HISTORY
 //
@@ -59,9 +60,10 @@
 //-----------------------------------------------------------------------------
 //  Defines
 //-----------------------------------------------------------------------------
-#define DIDDLING_FREQ		1000000		//1Mhz
-#define TIME_DELAY_TEXT		4			//Units of 1/8
+#define DIZZLING_FREQ		1000000		//1Mhz
+#define TIME_DELAY_TEXT		4			//Temporary screen texts: units of 1/8 sec
 
+										//Text coordinates
 #define COL_MODE			0
 #define ROW_MODE			0
 
@@ -103,6 +105,7 @@ static void Mode_Config (void);
 //
 //  DESCRIPTION:
 //
+//	Main program logic
 //
 //  ARGUMENTS:
 //     none.
@@ -120,13 +123,13 @@ void main()
 	BYTE bKey;
 	BYTE ii;
 
-	//M8C_EnableWatchDog;				// Enable watchdog
-	M8C_ClearWDTAndSleep;			// Put sleep and watchdog timers into a known state
-									// before enabling interrupts.
+	M8C_ClearWDTAndSleep;				// Put sleep and watchdog timers into a known state
+										// before enabling interrupts.
+										// Enables sleep timer
 	M8C_EnableIntMask(INT_MSK0, INT_MSK0_SLEEP);
-	M8C_EnableGInt;					// Enable global interrupt
+	M8C_EnableGInt;						// Enable global interrupt
 
-	DISP_Setup();
+	DISP_Setup();						// Enables display
 
 	// Display welcome screen
 	LCD_Position(0, 0);
@@ -135,10 +138,9 @@ void main()
 	LCD_PrCString(gWelcome2Str);
 	KEYPAD_WaitKey(TIME_DELAY_TEXT);
 
-	// Get stored correction factors
-	STR_Restore();
+	STR_Restore();						// Get stored correction factors
 
-	if (g_bIsCalibrated == FALSE)
+	if (g_bIsCalibrated == FALSE)		// If not calibrated presents warning text
 	{
 		BUZZ_BeepError();
 
@@ -147,42 +149,41 @@ void main()
 		LCD_PrCString(gErrorUncalibratedStr);
 		LCD_Position(1, 0);
 		LCD_PrCString(gPressAnyKeyStr);
-		// Wait key press
+										// Wait key press
 		KEYPAD_WaitKey(TIME_WAIT_KEY_S);
 		DISP_Clear();
 	}
 
-	// Enables DDS oscillator and backlight (shared port)
+										// Enables DDS oscillator and backlight (shared port)
 	Port_2_Data_SHADE |= XO_EN_MASK;
 	XO_EN_Data_ADDR |= XO_EN_MASK;
-	Delay_Ms(10);
+	Delay_Ms(10);						// Lets some time to stabilize oscillator
 	DDS_Init();
 
-	//Setup default frequency
+										// Setup default frequency
 	dwCurrentFreq = g_xBandLimits[bBand].middle * BAND_FREQ_MULT;
 
-	//Get band-specific correction factors based on current freq dial setting
+										// Get band-specific correction factors based on current freq dial setting
 	g_xBridgeCorrect = g_xBandCorrFactor[bBand];
 
-	//Set save band frequency to the center of each band
+										// Set save band frequency to the center of each band
 	for (ii=0; ii<BAND_MAX; ii++)
 	{
 		g_dwSaveFreqBand[ii] = g_xBandLimits[ii].middle * BAND_FREQ_MULT;
 	}
-	//Resets iddle counter
-	g_bIddleCounter = TIME_TO_IDDLE_S;
 
-	// Sets DDS gain
+										// Sets DDS gain
 	PGA_DDS_1_Start(PGA_DDS_1_HIGHPOWER);
 	PGA_DDS_2_Start(PGA_DDS_2_HIGHPOWER);
 	Adjust_Dds_Gain(bBand);
 
-	//Check Vf level
+										// Check Vf level
 	DDS_Set(dwCurrentFreq);
 	Delay_Ms(10);
 	Do_Measure();
 	DDS_Set(0);
-	if (g_xBridgeMeasure.Vf<500)
+
+	if (g_xBridgeMeasure.Vf<500)		// Vf too low, warn user
 	{
 		BUZZ_BeepError();
 
@@ -190,14 +191,16 @@ void main()
 		LCD_PrCString(gErrorAdjustVfStr);
 		LCD_Position(1, 0);
 		LCD_PrCString(gPressAnyKeyStr);
-		// Wait key press
+										// Wait key press
 		KEYPAD_WaitKey(TIME_WAIT_KEY_S);
 		DISP_Clear();
 	}
 
+										// Resets iddle counter
+	g_bIddleCounter = TIME_TO_IDDLE_S;
 	do
 	{
-		// Display mode and frequency
+										// Display mode and frequency
 		DISP_Clear();
 		LCD_Position(ROW_MODE, COL_MODE);
 		LCD_PrCString(gModeStr[bMode]);
@@ -207,16 +210,18 @@ void main()
 		{
 			if (bMode != MODE_OFF)
 			{
+										// Set frequency, measure, and deactivate
 				DDS_Set(dwCurrentFreq);
 				Delay_Ms(10);
 				Do_Measure();
 				DDS_Set(0);
-
+										// Do the basic calcs
 				gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 				gwZ = Calculate_Z(gwSwr, g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 				gwR = Calculate_R(gwZ, gwSwr);
 				gwX = Calculate_X(gwZ, gwR);
 
+										// Display data depending mode
 				switch (bMode)
 				{
 					case MODE_SWR:
@@ -224,30 +229,30 @@ void main()
 						LCD_PrCString(gBlankStr);
 						LCD_Position(ROW_SWR, COL_SWR);
 						DISP_Swr(gwSwr);
-
 						LCD_Position(ROW_IMP, COL_IMP);
 						DISP_Impedance(gwZ);
 						break;
 
 					case MODE_IMP:
-						// Diddling
-						{
+
+						{				// Dizzling
 							WORD wSwr;
 							WORD wZ;
 							WORD wX;
 							WORD wR;
 							BYTE bSign;
-
-							DDS_Set(dwCurrentFreq+DIDDLING_FREQ);
+										//Set frequency, measure, and deactivate
+							DDS_Set(dwCurrentFreq+DIZZLING_FREQ);
 							Delay_Ms(10);
 							Do_Measure();
 							DDS_Set(0);
+
 							wSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 							wZ = Calculate_Z(wSwr, g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 							wR = Calculate_R(wZ, wSwr);
 							wX = Calculate_X(wZ, wR);
-         					//Increasing X with increasing F ==> inductive reactance = +j
-         					//Decreasing X with increasing F ==> capacitive reactance = -j
+         								//Increasing X with increasing F ==> inductive reactance = +j
+         								//Decreasing X with increasing F ==> capacitive reactance = -j
 							if (wX >= gwX)
 								bSign = TRUE;
 							else
@@ -279,6 +284,7 @@ void main()
 						break;
 
 					case MODE_VFO:
+#if 0									// Just for test
 					{
 						char szText[17];
 						LCD_Position(ROW_SWR, 0);
@@ -299,13 +305,14 @@ void main()
 						ltoa(szText,g_xBridgeMeasure.Va/100,10);
 						LCD_PrString(szText);
 					}
+#endif
 						break;
 
 					default:
 						break;
 				}
 			}
-
+										// Waits for key or time for new measurement
 			g_bMeasureCounter = MEASURE_PERIOD;
 			do
 			{
@@ -314,44 +321,50 @@ void main()
 				switch ( bKey )
 				{
 					case KBD_CONFIG:
+										// Enter configuration mode routine
 						Mode_Config();
-						//Get band-specific correction factors based on current freq dial setting
+
+										// Get band-specific correction factors based on current freq dial setting
 						g_xBridgeCorrect = g_xBandCorrFactor[bBand];
+										// Adjust DDS gain setting
 						Adjust_Dds_Gain(bBand);
 						break;
 
 					case KBD_MODE:
 						if (bMode==MODE_OFF)
-						{
+						{				// Resume from OFF mode
 							PGA_DDS_1_Start(PGA_DDS_1_HIGHPOWER);
 							PGA_DDS_2_Start(PGA_DDS_2_HIGHPOWER);
 							Adjust_Dds_Gain(bBand);
 
-							// Enables DDS oscillator and backlight (shared port)
+										// Enables DDS oscillator and backlight (shared port)
 							//XO_EN_Data_ADDR |= XO_EN_MASK;
 						}
 						if (++bMode >= MODE_MAX)
 							bMode = MODE_SWR;
 						if (bMode==MODE_OFF)
-						{
+						{				// Enter OFF mode
 							PGA_DDS_1_Stop();
 							PGA_DDS_2_Stop();
 
-							// Disables DDS oscillator and backlight (shared port)
+										// Disables DDS oscillator and backlight (shared port)
 							//XO_EN_Data_ADDR &= ~XO_EN_MASK;
 						}
 						break;
 
 					case KBD_BAND:
-						g_dwSaveFreqBand[bBand] = dwCurrentFreq;			//Saves current freq
+										// Saves current freq
+						g_dwSaveFreqBand[bBand] = dwCurrentFreq;
 						if (++bBand >= BAND_MAX)
 							bBand = BAND_160M;
-						dwCurrentFreq = g_dwSaveFreqBand[bBand];			//Restores frequency
+										// Restores frequency
+						dwCurrentFreq = g_dwSaveFreqBand[bBand];
 
-						//Get band-specific correction factors based on current freq dial setting
+										// Get band-specific correction factors based on current freq dial setting
 						g_xBridgeCorrect = g_xBandCorrFactor[bBand];
 						Adjust_Dds_Gain(bBand);
 
+									// Displays band
 						DISP_Clear();
 						LCD_Position(0, 0);
 						LCD_PrCString(gBandLitStr);
@@ -361,6 +374,7 @@ void main()
 						break;
 
 					case KBD_SCAN:
+										// Enter scan mode
 						dwScanFreq = Mode_Scan(bBand, g_xConf.bStep);
 						if (dwScanFreq!=-1)
 						{
@@ -369,9 +383,11 @@ void main()
 						break;
 
 					case KBD_UP:
+										// Increases frequency
 						dwCurrentFreq += GetStep(g_xConf.bStep);
 						if (dwCurrentFreq >= (g_xBandLimits[bBand].high * BAND_FREQ_MULT))
 						{
+										// Frequency above band limit: go to next upper band
 							if (++bBand >= BAND_MAX)
 								bBand = 0;
 							g_xBridgeCorrect = g_xBandCorrFactor[bBand];
@@ -388,9 +404,11 @@ void main()
 						break;
 
 					case KBD_DWN:
+										// Decreases frequency
 						dwCurrentFreq -= GetStep(g_xConf.bStep);
 						if (dwCurrentFreq <= (g_xBandLimits[bBand].low * BAND_FREQ_MULT))
 						{
+										// Frequency below band limit: go to lower band
 							if (bBand-- == 0)
 								bBand = BAND_MAX-1;
 
@@ -412,15 +430,16 @@ void main()
 				}
 			} while ((bKey==0) && (g_bMeasureCounter!=0));
 
-			if (bKey!=0)
+										// Key pressed, resets user iddle timer
+			if (bKey != 0)
 				g_bIddleCounter = TIME_TO_IDDLE_S;
 
-			// Iddle mode (not for VFO mode)
+										// Iddle mode (not for VFO mode)
 			if ((g_bIddleCounter==0) && (bMode != MODE_VFO))
 			{
-				// Suspend
-				// Disables DDS oscillator and backlight (shared port)
-				DDS_Set(0);		//DDS power down
+										// Suspend
+										// Disables DDS oscillator and backlight (shared port)
+				DDS_Set(0);				// DDS power down
 				XO_EN_Data_ADDR &= ~XO_EN_MASK;
 				Port_2_Data_SHADE &= ~XO_EN_MASK;
 
@@ -428,15 +447,14 @@ void main()
 				PGA_DDS_2_Stop();
 
 				LCD_Init();
-				LCD_Control(LCD_OFF);						//Display off
+				LCD_Control(LCD_OFF);	// Display off
 
-				//Waits for a key press
-				KEYPAD_WaitKey(0);
+				KEYPAD_WaitKey(0);		// Waits for a key press
 
-				// Resumes
-				LCD_Control(LCD_ON);						//Display on
+										// Resumes
+				LCD_Control(LCD_ON);	// Display on
 
-				// Enables DDS oscillator and backlight (shared port)
+										// Enables DDS oscillator and backlight (shared port)
 				XO_EN_Data_ADDR |= XO_EN_MASK;
 				Port_2_Data_SHADE |= XO_EN_MASK;
 
@@ -447,7 +465,7 @@ void main()
 				DDS_Init();
 
 				g_bIddleCounter = TIME_TO_IDDLE_S;
-				bKey = 1;		//Forces exit loop
+				bKey = 1;				// Forces exit loop
 			}
 		} while (bKey==0);
 	} while (TRUE);
@@ -458,12 +476,14 @@ void main()
 //
 //  DESCRIPTION:
 //
+//	Scanning routine
 //
 //  ARGUMENTS:
-//     none.
+//  	bBand	Integer describing band number
+//		bStep	Integer describing frequency step value
 //
 //  RETURNS:
-//     none.
+//     Resonance frequency. (-1) if not found
 //
 //-----------------------------------------------------------------------------
 static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
@@ -476,14 +496,17 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 	WORD wSwrMin = 200;
 	BYTE bKey;
 
+										// Display mode
 	DISP_Clear();
 	LCD_Position(ROW_MODE, COL_MODE);
 	LCD_PrCString(gModeScanStr);
 
+										// Set frequency limits
 	dwCurrentFreq = g_xBandLimits[bBand].low * BAND_FREQ_MULT;
 	dwLimitFreq = g_xBandLimits[bBand].high * BAND_FREQ_MULT;
 	do
 	{
+										// Set frequency, measures, and calculate impedance
 		DDS_Set(dwCurrentFreq);
 		LCD_Position(ROW_FREQ, COL_FREQ);
 		DISP_Frequency(dwCurrentFreq);
@@ -499,6 +522,7 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 		DISP_Swr(gwSwr);
 		LCD_Position(ROW_IMP, COL_IMP);
 		DISP_Impedance(gwZ);
+										// Code to detect 2.0 SWR limits
 		if (gwSwr <= wSwrMin)
 		{
 			if (dwBwMinFreq==-1)
@@ -524,6 +548,7 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 		dwCurrentFreq += GetStep(bStep);
 	} while (dwCurrentFreq < dwLimitFreq);
 
+										// End of scanning
 	BUZZ_Beep();
 	DISP_Clear();
 	LCD_Position(0, 0);
@@ -536,11 +561,13 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 		if (dwBwMaxFreq==-1)
 			dwBwMaxFreq = dwCurrentFreq;
 
+										// Display bandwidth
 		LCD_Position(ROW_MODE, COL_MODE);
 		LCD_PrCString(gBandWidthStr);
 		LCD_Position(ROW_FREQ, COL_FREQ);
 		DISP_Frequency(dwBwMaxFreq-dwBwMinFreq);
 	}
+										// Wait user action or timeout
 	LCD_Position(1, 0);
 	LCD_PrCString(gPressAnyKeyStr);
 	KEYPAD_WaitKey(TIME_WAIT_KEY_S);
@@ -553,12 +580,13 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 //
 //  DESCRIPTION:
 //
+//	Gets the step value in Hz from the step index value
 //
 //  ARGUMENTS:
-//     none.
+//		bStep	Integer describing frequency step value
 //
 //  RETURNS:
-//     none.
+//     Step value in Hz
 //
 //-----------------------------------------------------------------------------
 static DWORD GetStep (BYTE bStep)
@@ -584,6 +612,7 @@ static DWORD GetStep (BYTE bStep)
 //
 //  DESCRIPTION:
 //
+//	Configuration routine
 //
 //  ARGUMENTS:
 //     none.
@@ -600,6 +629,7 @@ static void Mode_Config (void)
 
 	do
 	{
+										// Main configuration menu
 		DISP_Clear();
 		LCD_Position(0, 0);
 		LCD_PrCString(gConfigStr[bMenu]);
@@ -653,7 +683,7 @@ static void Mode_Config (void)
 				case CONFIG_CALIB:
 					LCD_Position(1, 0);
 					LCD_PrCString(gConfirmStr);
-					// Wait key press
+										// Wait key press
 					if (KEYPAD_WaitKey(TIME_WAIT_KEY_S) == KBD_DWN)
 						Calibrate_Reflectometer();
 					break;
@@ -661,7 +691,7 @@ static void Mode_Config (void)
 				case CONFIG_SW_LOAD:
 					LCD_Position(1, 0);
 					LCD_PrCString(gConfirmStr);
-					// Wait key press
+										// Wait key press
 					if (KEYPAD_WaitKey(TIME_WAIT_KEY_S) == KBD_DWN)
 					{
 						DISP_Clear();
@@ -676,34 +706,3 @@ static void Mode_Config (void)
 }
 
 
-//-----------------------------------------------------------------------------
-//  Trash
-//-----------------------------------------------------------------------------
-#if 0
-DAC8_1_Start(DAC8_1_HIGHPOWER);
-PGA_DDS_1_Start(PGA_DDS_1_HIGHPOWER);
-DAC8_1_WriteStall(g_bGainDDS[bBand]);
-while (1)
-{
-		char szText[17];
-							Do_Measure();
-		DISP_Clear();
-						LCD_Position(ROW_SWR, 0);
-						LCD_PrCString(gBlankStr);
-						LCD_Position(0, 0);
-						LCD_PrCString("Vf");
-						ltoa(szText,g_xBridgeMeasure.Vf/100,10);
-						LCD_PrString(szText);
-						LCD_PrCString(" Vr");
-						ltoa(szText,g_xBridgeMeasure.Vr/100,10);
-						LCD_PrString(szText);
-
-						LCD_Position(1, 0);
-						LCD_PrCString("Vz");
-						ltoa(szText,g_xBridgeMeasure.Vz/100,10);
-						LCD_PrString(szText);
-						LCD_PrCString(" Va");
-						ltoa(szText,g_xBridgeMeasure.Va/100,10);
-						LCD_PrString(szText);
-}
-#endif
