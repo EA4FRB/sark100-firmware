@@ -45,9 +45,10 @@
 //-----------------------------------------------------------------------------
 //  Prototypes
 //-----------------------------------------------------------------------------
-void Delay_Ms(WORD ms);
-BYTE BcdToHex ( BYTE bcd );
-BYTE HexToBcd ( BYTE hex );
+extern void Delay_Ms(WORD ms);
+extern BYTE BcdToHex ( BYTE bcd );
+extern BYTE HexToBcd ( BYTE hex );
+extern DWORD GetStep (BYTE bStep);
 
 //-----------------------------------------------------------------------------
 #endif
