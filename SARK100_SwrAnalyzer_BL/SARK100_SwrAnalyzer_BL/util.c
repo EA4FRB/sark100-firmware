@@ -40,7 +40,7 @@
 #include <m8c.h>        		// Part specific constants and macros
 #include "PSoCAPI.h"    		// PSoC API definitions for all User Modules
 #include "psocgpioint.h"
-
+#include "glb_data.h"
 #include "util.h"
 
 //-----------------------------------------------------------------------------
@@ -106,5 +106,35 @@ BYTE HexToBcd ( BYTE hex )
 	return ((BYTE)(hex/10)<<4) | (BYTE)(hex%10);
 }
 
-
+//-----------------------------------------------------------------------------
+//  FUNCTION NAME:	GetStep
+//
+//  DESCRIPTION:
+//
+//	Gets the step value in Hz from the step index value
+//
+//  ARGUMENTS:
+//		bStep	Integer describing frequency step value
+//
+//  RETURNS:
+//     Step value in Hz
+//
+//-----------------------------------------------------------------------------
+DWORD GetStep (BYTE bStep)
+{
+	switch (bStep)
+	{
+		case STEP_10HZ:
+			return 10;
+		default:
+		case STEP_100HZ:
+			return 100;
+		case STEP_1KHZ:
+			return 1000;
+		case STEP_10KHZ:
+			return 10000;
+		case STEP_100KHZ:
+			return 100000;
+	}
+}
 
