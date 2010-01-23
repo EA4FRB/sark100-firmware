@@ -82,7 +82,6 @@
 //  Prototypes
 //-----------------------------------------------------------------------------
 static DWORD Mode_Scan (BYTE bBand, BYTE bStep);
-static DWORD GetStep (BYTE bStep);
 static void Mode_Config (void);
 
 //-----------------------------------------------------------------------------
@@ -197,12 +196,12 @@ void main()
 			{
 										// Set frequency, measure, and deactivate
 				DDS_Set(dwCurrentFreq);
-				Delay_Ms(10);
+				Delay_Ms(200);
 				Do_Measure();
 				DDS_Set(0);
 										// Do the basic calcs
 				gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
-				gwZ = Calculate_Z(gwSwr, g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
+				gwZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 				gwR = Calculate_R(gwZ, gwSwr);
 				gwX = Calculate_X(gwZ, gwR);
 
@@ -214,8 +213,11 @@ void main()
 						LCD_PrCString(gBlankStr);
 						LCD_Position(ROW_SWR, COL_SWR);
 						DISP_Swr(gwSwr);
-						LCD_Position(ROW_IMP, COL_IMP);
-						DISP_Impedance(gwZ);
+						if (gwSwr<SWR_MAX)
+						{
+							LCD_Position(ROW_IMP, COL_IMP);
+							DISP_Impedance(gwZ);
+						}	
 						break;
 
 					case MODE_IMP:
@@ -228,12 +230,12 @@ void main()
 							BYTE bSign;
 										//Set frequency, measure, and deactivate
 							DDS_Set(dwCurrentFreq+DIZZLING_FREQ);
-							Delay_Ms(10);
+							Delay_Ms(100);
 							Do_Measure();
 							DDS_Set(0);
 
 							wSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
-							wZ = Calculate_Z(wSwr, g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
+							wZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 							wR = Calculate_R(wZ, wSwr);
 							wX = Calculate_X(wZ, wR);
          								//Increasing X with increasing F ==> inductive reactance = +j
@@ -247,25 +249,44 @@ void main()
 							LCD_PrCString(gBlankStr);
 							LCD_Position(ROW_SWR, COL_SWR);
 							DISP_Swr(gwSwr);
-							LCD_Position(ROW_IMP, COL_IMP);
-							DISP_ImpedanceComplex(gwR, gwX, bSign);
+							if (gwSwr<SWR_MAX)
+							{
+								LCD_Position(ROW_IMP, COL_IMP);
+								DISP_ImpedanceComplex(gwR, gwX, bSign);
+							}	
 						}
 						break;
 
 					case MODE_CAP:
 						LCD_Position(ROW_SWR, 0);
 						LCD_PrCString(gBlankStr);
-						LCD_Position(ROW_C, COL_C);
-						gwC = Calculate_C(gwX, dwCurrentFreq);
-						DISP_Capacitance(gwC);
+						if (gwSwr<SWR_MAX)
+						{
+							LCD_Position(ROW_C, COL_C);
+							gwC = Calculate_C(gwX, dwCurrentFreq);
+							DISP_Capacitance(gwC);
+						}	
+						else
+						{
+							LCD_Position(ROW_SWR, 0);
+							LCD_PrCString(gErrorOverflowStr);
+						}
 						break;
 
 					case MODE_IND:
 						LCD_Position(ROW_SWR, 0);
 						LCD_PrCString(gBlankStr);
-						LCD_Position(ROW_L, COL_L);
-						gwL = Calculate_L(gwX, dwCurrentFreq);
-						DISP_Inductance(gwL);
+						if (gwSwr<SWR_MAX)
+						{
+							LCD_Position(ROW_L, COL_L);
+							gwL = Calculate_L(gwX, dwCurrentFreq);
+							DISP_Inductance(gwL);
+						}	
+						else
+						{
+							LCD_Position(ROW_SWR, 0);
+							LCD_PrCString(gErrorOverflowStr);
+						}
 						break;
 
 					case MODE_VFO:
@@ -498,7 +519,7 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 
 		Do_Measure();
 		gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
-		gwZ = Calculate_Z(gwSwr, g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
+		gwZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 
 		LCD_Position(ROW_SWR, 0);
 		LCD_PrCString(gBlankStr);
@@ -558,38 +579,6 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 	KEYPAD_WaitKey(TIME_WAIT_KEY_S);
 
 	return dwResonanceFreq;
-}
-
-//-----------------------------------------------------------------------------
-//  FUNCTION NAME:	GetStep
-//
-//  DESCRIPTION:
-//
-//	Gets the step value in Hz from the step index value
-//
-//  ARGUMENTS:
-//		bStep	Integer describing frequency step value
-//
-//  RETURNS:
-//     Step value in Hz
-//
-//-----------------------------------------------------------------------------
-static DWORD GetStep (BYTE bStep)
-{
-	switch (bStep)
-	{
-		case STEP_10HZ:
-			return 10;
-		default:
-		case STEP_100HZ:
-			return 100;
-		case STEP_1KHZ:
-			return 1000;
-		case STEP_10KHZ:
-			return 10000;
-		case STEP_100KHZ:
-			return 100000;
-	}
 }
 
 //-----------------------------------------------------------------------------

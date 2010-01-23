@@ -87,7 +87,7 @@ void Calibrate_Reflectometer (void)
 		DISP_Clear();
 
 		DDS_Set(0);
-		Delay_Ms(100);
+		Delay_Ms(200);
 
 										// No signal, no load
 										// Get offset readings
@@ -128,7 +128,7 @@ void Calibrate_Reflectometer (void)
 			{
 				PGA_DDS_1_SetGain(g_xGainDds[bGainIdx].bGain1);
 				PGA_DDS_2_SetGain(g_xGainDds[bGainIdx].bGain2);
-				Delay_Ms(100);
+				Delay_Ms(200);
 				Do_Measure();
 
 				if (g_xBridgeMeasure.Vf > (VF_REFERENCE_LEVEL-g_xBridgeOffset.Vf))
@@ -178,7 +178,7 @@ void Calibrate_Reflectometer (void)
 		{
 			Adjust_Dds_Gain(bBand);
 			DDS_Set(g_xBandLimits[bBand].middle * BAND_FREQ_MULT);
-			Delay_Ms(100);
+			Delay_Ms(200);
 
 			Do_Measure();
 
@@ -206,7 +206,7 @@ void Calibrate_Reflectometer (void)
 		{
 			Adjust_Dds_Gain(bBand);
 			DDS_Set(g_xBandLimits[bBand].middle * BAND_FREQ_MULT);
-			Delay_Ms(100);
+			Delay_Ms(200);
 			Do_Measure();
 
 			g_xBandCorrFactor[bBand].Vr = (g_xBridgeMeasure.Vf*100)/(2*g_xBridgeMeasure.Vr);

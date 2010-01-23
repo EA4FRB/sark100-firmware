@@ -42,28 +42,9 @@
 
 #include "PSoCAPI.h"
 #include "psocgpioint.h"
-
+#include "glb_data.h"
 #include "calibrate_reflectometer.h"
 
-//-----------------------------------------------------------------------------
-//  Macros
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-//  Defines
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-//  Public data:
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-//  Externals
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-//  Private data:
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 //  Prototypes
 //-----------------------------------------------------------------------------
@@ -93,17 +74,20 @@ WORD Calculate_Swr (DWORD dwVf, DWORD dwVr)
 {
 	DWORD dwDenominator;
 	DWORD dwNumerator;
-
+	WORD wSwr;
+	
 	if (dwVf>dwVr)
 		dwDenominator = dwVf-dwVr;
-	else if (dwVr>dwVf)
-		dwDenominator = dwVr-dwVf;
 	else
-		return (WORD) -1;				// Error
+		dwDenominator = 1;		
 
 	dwNumerator = (dwVf+dwVr)*100;
 
-	return (dwNumerator/dwDenominator);
+	wSwr = (dwNumerator/dwDenominator);
+	if (wSwr > SWR_MAX)
+		wSwr = SWR_MAX;
+		
+	return wSwr;
 }
 
 //-----------------------------------------------------------------------------
@@ -116,7 +100,6 @@ WORD Calculate_Swr (DWORD dwVf, DWORD dwVr)
 //	Z = (50 * Vz)/Va;
 //
 //  ARGUMENTS:
-//  	wSwr
 //		dwVz
 //		dwVa
 //
@@ -124,15 +107,18 @@ WORD Calculate_Swr (DWORD dwVf, DWORD dwVr)
 //     Z
 //
 //-----------------------------------------------------------------------------
-WORD Calculate_Z (WORD wSwr, DWORD dwVz, DWORD dwVa)
+WORD Calculate_Z (DWORD dwVz, DWORD dwVa)
 {
-	if (wSwr>999)
-		return -1;
-
+	WORD wZ;
+	
 	if (dwVa == 0)						// Avoids divide by zero
-		return (WORD)-1;
+		dwVa = 1;
 
-	return ((DWORD)(dwVz * (DWORD)50))/dwVa;
+	wZ = ((DWORD)(dwVz * (DWORD)50))/dwVa;
+	if (wZ > 9999)
+		wZ = 9999;
+		
+	return wZ;
 }
 
 //-----------------------------------------------------------------------------
@@ -158,21 +144,16 @@ WORD Calculate_R (WORD wZ, WORD wSwr)
 {
 	DWORD dwNumerator;
 	DWORD dwDenominator;
+	WORD wR;
 
-	if (wZ == 0)
-		return 0;
-	if (wZ == -1 || wSwr == -1)
-		return -1;
-	if (wSwr>999)
-	{
-		return -1;
-	}
 	dwDenominator = (((DWORD)wSwr*wSwr)/2)+5000;
-	if (dwDenominator == 0)				// Avoids divide by zero
-		return (WORD)-1;
 	dwNumerator = (((DWORD)wZ*wZ) + 2500) * (DWORD)wSwr;
 
-	return dwNumerator/dwDenominator;
+	wR = dwNumerator/dwDenominator;
+	if (wR>9999)
+		wR = 9999;
+
+	return wR;
 }
 
 //-----------------------------------------------------------------------------
@@ -195,14 +176,16 @@ WORD Calculate_R (WORD wZ, WORD wSwr)
 WORD Calculate_X (WORD wZ, WORD wR)
 {
 	DWORD dwTemp;
-
-	if (wZ == -1 || wR == -1)
-		return -1;
+	WORD wX;
+	
 	dwTemp = ((DWORD)wZ*wZ)-((DWORD)wR*wR);
 	if ((signed long)dwTemp<0)
 		return 0;
 
-	return Calc_Sqrt(dwTemp);
+	wX = Calc_Sqrt(dwTemp);
+	if (wX > 9999)
+		wX = 9999;
+	return wX;
 }
 
 //-----------------------------------------------------------------------------
@@ -225,9 +208,6 @@ WORD Calculate_X (WORD wZ, WORD wR)
 WORD Calculate_L (WORD wX, DWORD dwFreq)
 {
 	DWORD dwTemp;
-
-	if (wX == -1)
-		return -1;
 
 	dwFreq /= 1000;						// Hz to Khz
 
@@ -254,13 +234,11 @@ WORD Calculate_L (WORD wX, DWORD dwFreq)
 //-----------------------------------------------------------------------------
 WORD Calculate_C (WORD wX, DWORD dwFreq)
 {
-	if (wX==0)
-		return 0;
-	if (wX == -1)
-		return -1;
 
 	dwFreq /= 1000;		//Hz to Khz
 
+	if (wX==0)
+		wX=1;
 	return ((DWORD)10000/63) * 	((DWORD)10000/dwFreq) * ((DWORD)10000/(wX*10));
 }
 

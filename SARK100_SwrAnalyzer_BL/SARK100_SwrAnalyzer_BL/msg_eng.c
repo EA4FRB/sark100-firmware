@@ -47,7 +47,7 @@
 BYTE const gBlankStr	[] = "                ";
 
 BYTE const gWelcome1Str	[] = "SARK100 ANALYZER";
-BYTE const gWelcome2Str	[] = "(c)EA4FRB 10 V02";
+BYTE const gWelcome2Str	[] = "(c)EA4FRB 10 V03";
 
 BYTE const gConfigPcLinkStr	[] = "PC Link";
 BYTE const gConfigStepStr	[] = "Step Size";
@@ -127,7 +127,7 @@ BYTE const g150OhmLoadStr		[] = "Conn 150 \xf4 load ";
 BYTE const gErrorUncalibratedStr[] = "Uncalibrated !! ";
 BYTE const gPressAnyKeyStr		[] = "Press any key";
 
-BYTE const gErrorOverflowStr	[] = "Ovf";
+BYTE const gErrorOverflowStr	[] = ">>>";
 
 BYTE const gNotImplementedStr	[] = "Not Implemented";
 

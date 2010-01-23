@@ -195,9 +195,9 @@ void DISP_Swr ( WORD wSwr )
 {
 	char szSwr[4];
 
-	if (wSwr>SWR_MAX)
+	if (wSwr>=SWR_MAX)
 	{
-		LCD_PrCString(">10");
+		LCD_PrCString(gErrorOverflowStr);
 		return;
 	}
 	itoa(szSwr, wSwr, 10);
@@ -227,11 +227,6 @@ void DISP_ImpedanceComplex ( WORD wR, WORD wX, BYTE bIsPositive )
 {
 	char szText[16];
 
-	if (wR==-1 || wX==-1)
-	{
-		LCD_PrCString(gErrorOverflowStr);
-		return;
-	}
 	if (wR>10000)
 	{
 		itoa(szText, wR/1000, 10);
@@ -279,19 +274,12 @@ void DISP_Capacitance ( WORD wC )
 	char szC[16];
 
 	LCD_PrCString("C = ");
-	if (wC==-1)
-	{
-		LCD_PrCString(gErrorOverflowStr);
-	}
-	else
-	{
-		itoa(szC, wC/10, 10);
-		LCD_PrString(szC);
-		LCD_Write_Data( '.' );
-		itoa(szC, wC%10, 10);
-		LCD_PrString(szC);
-		LCD_PrCString("pF");
-	}
+	itoa(szC, wC/10, 10);
+	LCD_PrString(szC);
+	LCD_Write_Data( '.' );
+	itoa(szC, wC%10, 10);
+	LCD_PrString(szC);
+	LCD_PrCString("pF");
 }
 
 //-----------------------------------------------------------------------------
@@ -313,19 +301,12 @@ void DISP_Inductance ( WORD wL )
 	char szL[16];
 
 	LCD_PrCString("L = ");
-	if (wL==-1)
-	{
-		LCD_PrCString(gErrorOverflowStr);
-	}
-	else
-	{
-		itoa(szL, wL/10, 10);
-		LCD_PrString(szL);
-		LCD_Write_Data( '.' );
-		itoa(szL, wL%10, 10);
-		LCD_PrString(szL);
-		LCD_PrCString("uH");
-	}
+	itoa(szL, wL/10, 10);
+	LCD_PrString(szL);
+	LCD_Write_Data( '.' );
+	itoa(szL, wL%10, 10);
+	LCD_PrString(szL);
+	LCD_PrCString("uH");
 }
 
 //-----------------------------------------------------------------------------
@@ -347,16 +328,9 @@ void DISP_Impedance ( WORD wZ )
 	char szZ[16];
 
 	LCD_PrCString("Z = ");
-	if (wZ==-1)
-	{
-		LCD_PrCString(gErrorOverflowStr);
-	}
-	else
-	{
-		itoa(szZ, wZ, 10);
-		LCD_PrString(szZ);
-		LCD_PrCString(" \xf4");
-	}
+	itoa(szZ, wZ, 10);
+	LCD_PrString(szZ);
+	LCD_PrCString(" \xf4");
 }
 
 //-----------------------------------------------------------------------------
