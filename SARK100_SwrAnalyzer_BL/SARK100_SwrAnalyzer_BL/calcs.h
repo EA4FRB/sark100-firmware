@@ -46,7 +46,7 @@
 //  Prototypes
 //-----------------------------------------------------------------------------
 WORD Calculate_Swr (DWORD dwVf, DWORD dwVr);
-WORD Calculate_Z (WORD wSwr, DWORD dwVz, DWORD dwVa);
+WORD Calculate_Z (DWORD dwVz, DWORD dwVa);
 WORD Calculate_R (WORD wZ, WORD wSwr);
 WORD Calculate_X (WORD wZ, WORD wR);
 WORD Calculate_L (WORD wX, DWORD dwFreq);
