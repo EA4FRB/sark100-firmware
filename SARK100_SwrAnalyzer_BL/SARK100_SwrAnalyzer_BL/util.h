@@ -49,6 +49,7 @@ extern void Delay_Ms(WORD ms);
 extern BYTE BcdToHex ( BYTE bcd );
 extern BYTE HexToBcd ( BYTE hex );
 extern DWORD GetStep (BYTE bStep);
+extern BYTE GetUserIddle (BYTE bUserIddle);
 
 //-----------------------------------------------------------------------------
 #endif
