@@ -107,7 +107,7 @@ void main()
 	BYTE bKey;
 	BYTE ii;
 	BYTE bUserIddle;
-	
+
 	M8C_ClearWDTAndSleep;				// Put sleep and watchdog timers into a known state
 										// before enabling interrupts.
 										// Enables sleep timer
@@ -218,7 +218,7 @@ void main()
 						{
 							LCD_Position(ROW_IMP, COL_IMP);
 							DISP_Impedance(gwZ);
-						}	
+						}
 						break;
 
 					case MODE_IMP:
@@ -254,7 +254,7 @@ void main()
 							{
 								LCD_Position(ROW_IMP, COL_IMP);
 								DISP_ImpedanceComplex(gwR, gwX, bSign);
-							}	
+							}
 						}
 						break;
 
@@ -266,7 +266,7 @@ void main()
 							LCD_Position(ROW_C, COL_C);
 							gwC = Calculate_C(gwX, dwCurrentFreq);
 							DISP_Capacitance(gwC);
-						}	
+						}
 						else
 						{
 							LCD_Position(ROW_SWR, 0);
@@ -282,7 +282,7 @@ void main()
 							LCD_Position(ROW_L, COL_L);
 							gwL = Calculate_L(gwX, dwCurrentFreq);
 							DISP_Inductance(gwL);
-						}	
+						}
 						else
 						{
 							LCD_Position(ROW_SWR, 0);
@@ -420,7 +420,7 @@ void main()
 			if (bKey != 0)
 				g_bIddleCounter = GetUserIddle(g_xConf.bUserIddle);
 
-										// Iddle mode 
+										// Iddle mode
 			if ((g_bIddleCounter==0) && (GetUserIddle(g_xConf.bUserIddle) != 0))
 			{
 										// Suspend
@@ -439,7 +439,6 @@ void main()
 
 										// Resumes
 				LCD_Control(LCD_ON);	// Display on
-
 										// Enables DDS oscillator and backlight (shared port)
 				XO_EN_Data_ADDR |= XO_EN_MASK;
 				Port_2_Data_SHADE |= XO_EN_MASK;
@@ -510,7 +509,7 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 #if 0
 		LCD_Position(ROW_IMP, COL_IMP);
 		DISP_Impedance(gwZ);
-#endif		
+#endif
 										// Code to detect 2.0 SWR limits
 		if (gwSwr <= wSwrMin)
 		{
@@ -634,6 +633,7 @@ static void Mode_Config (void)
 						{
 							g_xConf.bStep = bStep;
 							STR_SaveConfig();
+							break;
 						}
 					} while(TRUE);
 					break;
@@ -661,6 +661,7 @@ static void Mode_Config (void)
 						{
 							g_xConf.bUserIddle = bUserIddle;
 							STR_SaveConfig();
+							break;
 						}
 					} while(TRUE);
 					break;
