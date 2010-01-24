@@ -54,7 +54,11 @@ extern BYTE const *gModeStr[];
 
 extern BYTE const *gStepStr[];
 
+extern BYTE const *gIddleStr[];
+
 extern BYTE const *gBandStr[];
+
+extern BYTE const gConfigIddleStr[];
 
 extern BYTE const *gConfigStr[];
 

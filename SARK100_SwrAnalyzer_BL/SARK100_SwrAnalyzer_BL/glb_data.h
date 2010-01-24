@@ -45,9 +45,15 @@
 #include "measure.h"
 
 //-----------------------------------------------------------------------------
+//  Version string
+//-----------------------------------------------------------------------------
+#define VERSION_STR			"V03"
+#define PRODUCT_NAME_STR	"SARK100"
+
+//-----------------------------------------------------------------------------
 //  Defines
 //-----------------------------------------------------------------------------
-#define TIME_TO_IDDLE_S		30			// Time for user iddle detection, units of seconds
+
 #define TIME_WAIT_KEY_S		30			// Time to wait for key when dialog, units of seconds
 
 #define	MEASURE_PERIOD		16			// Measurements sample period, units 1/8 sec
@@ -61,6 +67,7 @@
 typedef enum {							// Configuration menu
 	CONFIG_PCLINK = 0,
 	CONFIG_STEP,
+	CONFIG_IDDLE,
 	CONFIG_CALIB,
 	CONFIG_SW_LOAD,
 
@@ -88,6 +95,15 @@ typedef enum {							// Step values
 
 	STEP_MAX
 } STEP_DEFS;
+
+typedef enum {							// User iddle timeout values
+	USER_IDDLE_NONE,
+	USER_IDDLE_30S,
+	USER_IDDLE_60S,
+	USER_IDDLE_90S,
+
+	USER_IDDLE_MAX
+} USER_IDDLE_DEFS;
 
 typedef enum {							// Band values
 	BAND_160M,
@@ -121,6 +137,7 @@ typedef struct							// PGA's DDS gain settings
 typedef struct							// Configuration data stored in EEPROM
 {
 	BYTE bStep;
+	BYTE bUserIddle;
 } CONFIG_DATA;
 
 //-----------------------------------------------------------------------------
@@ -129,6 +146,7 @@ typedef struct							// Configuration data stored in EEPROM
 extern volatile BYTE g_bIddleCounter;
 extern volatile BYTE g_bMeasureCounter;
 extern volatile BYTE g_bDebounceCounter;
+extern volatile BYTE g_bSpeedKeyCounter;
 
 extern BYTE g_bIsCalibrated;
 extern BYTE g_bGainDDS[BAND_MAX];

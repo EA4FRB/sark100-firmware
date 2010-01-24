@@ -138,3 +138,32 @@ DWORD GetStep (BYTE bStep)
 	}
 }
 
+//-----------------------------------------------------------------------------
+//  FUNCTION NAME:	GetUserIddle
+//
+//  DESCRIPTION:
+//
+//	Gets the user iddle timeout from index
+//
+//  ARGUMENTS:
+//		bUserIddle	User iddle index val
+//
+//  RETURNS:
+//     Step value in Hz
+//
+//-----------------------------------------------------------------------------
+BYTE GetUserIddle (BYTE bUserIddle)
+{
+	switch (bUserIddle)
+	{
+		case USER_IDDLE_NONE:
+			return 0;
+		default:
+		case USER_IDDLE_30S:
+			return 30;
+		case USER_IDDLE_60S:
+			return 60;
+		case USER_IDDLE_90S:
+			return 90;
+	}
+}

@@ -49,6 +49,7 @@
 volatile BYTE g_bIddleCounter = 0;
 volatile BYTE g_bMeasureCounter = 0;
 volatile BYTE g_bDebounceCounter = 0;
+volatile BYTE g_bSpeedKeyCounter = 0;
 
 BYTE g_bIsCalibrated;					// TRUE if calibrated
 BYTE g_bGainDDS[BAND_MAX];				// DDS PGA's settings for each band

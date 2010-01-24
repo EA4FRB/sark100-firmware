@@ -52,7 +52,6 @@
 //  Public functions
 //-----------------------------------------------------------------------------
 void DISP_Setup ( void );
-void DISP_UpdateLevelBargraph ( BYTE bitmapId, BYTE level );
 void DISP_Frequency ( DWORD dwFreq );
 void DISP_Swr ( WORD wSwr );
 void DISP_ImpedanceComplex ( WORD wR, WORD wX, BYTE bIsPositive );
@@ -60,24 +59,6 @@ void DISP_Impedance ( WORD wZ );
 void DISP_Capacitance ( WORD wC );
 void DISP_Inductance ( WORD wL );
 void DISP_Clear (void);
-
-//-----------------------------------------------------------------------------
-//  Icons definitions
-//-----------------------------------------------------------------------------
-#define ID_BITMAP_UP_ARROW		1
-#define ID_BITMAP_DOWN_ARROW	2
-#define ID_BITMAP_LEFT_ARROW	3
-#define ID_BITMAP_RIGHT_ARROW	4
-#define ID_BITMAP_REC_LEVEL		5
-#define ID_BITMAP_SQUELCH_LEVEL	6
-
-#define STR_BACK_ARROW			"\x7f"
-#define STR_UP_ARROW			"\x01"
-#define STR_DOWN_ARROW			"\x02"
-#define STR_LEFT_ARROW			"\x03"
-#define STR_RIGHT_ARROW			"\x04"
-#define STR_REC_LEVEL			"\x05"
-#define STR_SQUELCH_LEVEL		"\x06"
 
 //*****************************************************************************
 #endif

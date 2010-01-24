@@ -106,7 +106,8 @@ void main()
 	BYTE bBand = BAND_30M;
 	BYTE bKey;
 	BYTE ii;
-
+	BYTE bUserIddle;
+	
 	M8C_ClearWDTAndSleep;				// Put sleep and watchdog timers into a known state
 										// before enabling interrupts.
 										// Enables sleep timer
@@ -181,7 +182,7 @@ void main()
 	}
 
 										// Resets iddle counter
-	g_bIddleCounter = TIME_TO_IDDLE_S;
+	g_bIddleCounter = GetUserIddle(g_xConf.bUserIddle);
 	do
 	{
 										// Display mode and frequency
@@ -289,31 +290,6 @@ void main()
 						}
 						break;
 
-					case MODE_VFO:
-#if 0									// Just for test
-					{
-						char szText[17];
-						LCD_Position(ROW_SWR, 0);
-						LCD_PrCString(gBlankStr);
-						LCD_Position(0, 0);
-						LCD_PrCString("Vf");
-						ltoa(szText,g_xBridgeMeasure.Vf/100,10);
-						LCD_PrString(szText);
-						LCD_PrCString(" Vr");
-						ltoa(szText,g_xBridgeMeasure.Vr/100,10);
-						LCD_PrString(szText);
-
-						LCD_Position(1, 0);
-						LCD_PrCString("Vz");
-						ltoa(szText,g_xBridgeMeasure.Vz/100,10);
-						LCD_PrString(szText);
-						LCD_PrCString(" Va");
-						ltoa(szText,g_xBridgeMeasure.Va/100,10);
-						LCD_PrString(szText);
-					}
-#endif
-						break;
-
 					default:
 						break;
 				}
@@ -388,6 +364,8 @@ void main()
 						}
 						break;
 
+					case KBD_2xUP:
+						dwCurrentFreq += GetStep(g_xConf.bStep);
 					case KBD_UP:
 										// Increases frequency
 						dwCurrentFreq += GetStep(g_xConf.bStep);
@@ -409,6 +387,8 @@ void main()
 						}
 						break;
 
+					case KBD_2xDWN:
+						dwCurrentFreq -= GetStep(g_xConf.bStep);
 					case KBD_DWN:
 										// Decreases frequency
 						dwCurrentFreq -= GetStep(g_xConf.bStep);
@@ -438,10 +418,10 @@ void main()
 
 										// Key pressed, resets user iddle timer
 			if (bKey != 0)
-				g_bIddleCounter = TIME_TO_IDDLE_S;
+				g_bIddleCounter = GetUserIddle(g_xConf.bUserIddle);
 
-										// Iddle mode (not for VFO mode)
-			if ((g_bIddleCounter==0) && (bMode != MODE_VFO))
+										// Iddle mode 
+			if ((g_bIddleCounter==0) && (GetUserIddle(g_xConf.bUserIddle) != 0))
 			{
 										// Suspend
 										// Disables DDS oscillator and backlight (shared port)
@@ -470,7 +450,7 @@ void main()
 
 				DDS_Init();
 
-				g_bIddleCounter = TIME_TO_IDDLE_S;
+				g_bIddleCounter = GetUserIddle(g_xConf.bUserIddle);
 				bKey = 1;				// Forces exit loop
 			}
 		} while (bKey==0);
@@ -519,15 +499,18 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 
 		Do_Measure();
 		gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
+#if 0
 		gwZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
-
+#endif
 		LCD_Position(ROW_SWR, 0);
 		LCD_PrCString(gBlankStr);
 
 		LCD_Position(ROW_SWR, COL_SWR);
 		DISP_Swr(gwSwr);
+#if 0
 		LCD_Position(ROW_IMP, COL_IMP);
 		DISP_Impedance(gwZ);
+#endif		
 										// Code to detect 2.0 SWR limits
 		if (gwSwr <= wSwrMin)
 		{
@@ -600,6 +583,7 @@ static void Mode_Config (void)
 	BYTE bMenu = 0;
 	BYTE bKey;
 	BYTE bStep;
+	BYTE bUserIddle;
 
 	do
 	{
@@ -649,6 +633,33 @@ static void Mode_Config (void)
 						else if (bKey==KBD_DWN)
 						{
 							g_xConf.bStep = bStep;
+							STR_SaveConfig();
+						}
+					} while(TRUE);
+					break;
+
+				case CONFIG_IDDLE:
+					bUserIddle = g_xConf.bUserIddle;
+					do
+					{
+						DISP_Clear();
+						LCD_Position(0, 0);
+						LCD_PrCString(gConfigStr[bMenu]);
+						LCD_Position(1, 0);
+						LCD_PrCString(gIddleStr[bUserIddle]);
+						bKey = KEYPAD_WaitKey(TIME_WAIT_KEY_S);
+						if (bKey==KBD_CONFIG)
+						{
+							if (++bUserIddle>=USER_IDDLE_MAX)
+								bUserIddle = 0;
+						}
+						else if (bKey==KBD_UP)
+						{
+							break;
+						}
+						else if (bKey==KBD_DWN)
+						{
+							g_xConf.bUserIddle = bUserIddle;
 							STR_SaveConfig();
 						}
 					} while(TRUE);

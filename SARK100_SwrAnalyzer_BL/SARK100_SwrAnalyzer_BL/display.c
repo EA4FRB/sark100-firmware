@@ -46,19 +46,6 @@
 #include "glb_data.h"
 
 //-----------------------------------------------------------------------------
-//  Icons bitmap definition
-//-----------------------------------------------------------------------------
-static BYTE const UpArrowBitmap[8] = 		{ 0x00, 0x00, 0x04, 0x0e, 0x1f, 0x00, 0x00, 0x00 };
-static BYTE const DownArrowBitmap[8] = 		{ 0x00, 0x00, 0x1f, 0x0e, 0x04, 0x00, 0x00, 0x00 };
-static BYTE const LeftArrowBitmap[8] = 		{ 0x00, 0x02, 0x06, 0x0e, 0x06, 0x02, 0x00, 0x00 };
-static BYTE const RightArrowBitmap[8] = 	{ 0x00, 0x08, 0x0c, 0x0e, 0x0c, 0x08, 0x00, 0x00 };
-
-//-----------------------------------------------------------------------------
-//  Private functions prototypes
-//-----------------------------------------------------------------------------
-static void Configure_CG_Bitmap ( BYTE bitmapId, BYTE const *bitmapPtr  );
-
-//-----------------------------------------------------------------------------
 //  FUNCTION NAME: DISP_Setup
 //
 //  DESCRIPTION:
@@ -75,71 +62,7 @@ static void Configure_CG_Bitmap ( BYTE bitmapId, BYTE const *bitmapPtr  );
 void DISP_Setup ( void )
 {
 	LCD_Start();
-
-	Configure_CG_Bitmap( ID_BITMAP_UP_ARROW,    UpArrowBitmap );
-	Configure_CG_Bitmap( ID_BITMAP_DOWN_ARROW,  DownArrowBitmap );
-	Configure_CG_Bitmap( ID_BITMAP_LEFT_ARROW,  LeftArrowBitmap );
-	Configure_CG_Bitmap( ID_BITMAP_RIGHT_ARROW, RightArrowBitmap );
-	DISP_UpdateLevelBargraph( ID_BITMAP_REC_LEVEL,     0 );
-	DISP_UpdateLevelBargraph( ID_BITMAP_SQUELCH_LEVEL, 0 );
 }
-
-//-----------------------------------------------------------------------------
-//  FUNCTION NAME: UpdateLevelBargraph
-//
-//  DESCRIPTION:
-//
-//	Update bargraph bitmap based on provided level
-//
-//  ARGUMENTS:
-//	  bitmapId : bitmap identifier
-//    level    : {0..7}
-//
-//  RETURNS:
-//    none.
-//
-//-----------------------------------------------------------------------------
-void DISP_UpdateLevelBargraph ( BYTE bitmapId, BYTE level )
-{
-	BYTE ii;
-
-	level &= 0x7;
-
-	for ( ii = 0; ii < 8; ii++ )
-	{
-		LCD_Control( 0x40 + bitmapId*8 + 7 - ii);
-		if ( ii >= level+1 )
-			LCD_Write_Data( 0x00 );
-		else
-			LCD_Write_Data( 0x1f );
-	}
-}
-
-//-----------------------------------------------------------------------------
-//  FUNCTION NAME: Configure_CG_Bitmap
-//
-//  DESCRIPTION:
-//
-//	Configurate display character generator RAM to display icons
-//
-//  ARGUMENTS:
-//
-//
-//  RETURNS:
-//    none.
-//
-//-----------------------------------------------------------------------------
-static void Configure_CG_Bitmap ( BYTE bitmapId, BYTE const *bitmapPtr  )
-{
-	BYTE ii;
-
-	for ( ii = 0; ii < 8; ii++ )
-	{
-		LCD_Control( 0x40 + bitmapId*8 + ii);
-		LCD_Write_Data( *(bitmapPtr+ii) );
-	}
-}
-
 //-----------------------------------------------------------------------------
 //  FUNCTION NAME: DISP_Frequency
 //
@@ -208,7 +131,7 @@ void DISP_Swr ( WORD wSwr )
 }
 
 //-----------------------------------------------------------------------------
-//  FUNCTION NAME: DISP_Impedance
+//  FUNCTION NAME: DISP_ImpedanceComplez
 //
 //  DESCRIPTION:
 //
@@ -227,32 +150,14 @@ void DISP_ImpedanceComplex ( WORD wR, WORD wX, BYTE bIsPositive )
 {
 	char szText[16];
 
-	if (wR>10000)
-	{
-		itoa(szText, wR/1000, 10);
-		LCD_PrString(szText);
-		LCD_Write_Data( 'K' );
-	}
-	else
-	{
-		itoa(szText, wR, 10);
-		LCD_PrString(szText);
-	}
+	itoa(szText, wR, 10);
+	LCD_PrString(szText);
 	if (bIsPositive)
 		LCD_PrCString("+j");
 	else
-		LCD_PrCString("-j");
-	if (wX>10000)
-	{
-		itoa(szText, wX/1000, 10);
-		LCD_PrString(szText);
-		LCD_Write_Data( 'K' );
-	}
-	else
-	{
-		itoa(szText, wX, 10);
-		LCD_PrString(szText);
-	}
+	LCD_PrCString("-j");
+	itoa(szText, wX, 10);
+	LCD_PrString(szText);
 }
 
 //-----------------------------------------------------------------------------

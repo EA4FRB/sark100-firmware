@@ -46,16 +46,18 @@
 //-----------------------------------------------------------------------------
 BYTE const gBlankStr	[] = "                ";
 
-BYTE const gWelcome1Str	[] = "SARK100 ANALYZER";
-BYTE const gWelcome2Str	[] = "(c)EA4FRB 10 V03";
+BYTE const gWelcome1Str	[] = PRODUCT_NAME_STR " ANALYZER";
+BYTE const gWelcome2Str	[] = "(c)EA4FRB 10 " VERSION_STR;
 
 BYTE const gConfigPcLinkStr	[] = "PC Link";
 BYTE const gConfigStepStr	[] = "Step Size";
+BYTE const gConfigIddleStr	[] = "Suspend Timeout";
 BYTE const gConfigCalibStr	[] = "Calibrate";
 BYTE const gConfigSwLoadStr	[] = "Software Load";
 BYTE const *gConfigStr[] = {
 							gConfigPcLinkStr,
 							gConfigStepStr,
+							gConfigIddleStr,
 							gConfigCalibStr,
 							gConfigSwLoadStr
 							};
@@ -86,6 +88,17 @@ BYTE const *gStepStr[] = {
 							gStep1KhzStr,
 							gStep10KhzStr,
 							gStep100KhzStr
+							};
+
+BYTE const gIddleOffStr    [] = "Off";
+BYTE const gIddle30SStr    [] = "30 S";
+BYTE const gIddle60SStr    [] = "60 S";
+BYTE const gIddle90SStr    [] = "90 S";
+BYTE const *gIddleStr[] = {
+							gIddleOffStr,
+							gIddle30SStr,
+							gIddle60SStr,
+							gIddle90SStr
 							};
 
 BYTE const gBand160MStr   [] = "160M";

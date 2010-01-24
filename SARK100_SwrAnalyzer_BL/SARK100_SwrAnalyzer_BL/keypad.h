@@ -50,6 +50,8 @@
 #define KBD_SCAN	4
 #define KBD_UP		5
 #define KBD_DWN		6
+#define KBD_2xUP	7
+#define KBD_2xDWN	8
 
 //-----------------------------------------------------------------------------
 //  Prototypes

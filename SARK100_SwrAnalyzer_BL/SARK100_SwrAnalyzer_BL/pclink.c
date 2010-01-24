@@ -59,7 +59,7 @@ static BYTE const gszCmdMeasRaw	[] = "raw";
 static BYTE const gszCmdScan	[] = "scan";
 static BYTE const gszCmdScanRaw	[] = "scanr";
 
-static BYTE const gszWelcome	[] = "\r\nSARK100 SWR Analyzer V0.3\r\n";
+static BYTE const gszWelcome	[] = "\r\n" PRODUCT_NAME_STR " SWR Analyzer " VERSION_STR "\r\n";
 static BYTE const gszCmdPrompt	[] = "\r\n>>";
 static BYTE const gszWaitLink	[] = "Waiting Link";
 static BYTE const gszOk			[] = "\r\nOK\r\n";

@@ -76,9 +76,13 @@ void SleepTimerINT ( void )
 	if( --gTickCount )
     	return;
 	gTickCount = 8;
-
+	
 										// One second
-	g_bIddleCounter--;
+	if (g_bSpeedKeyCounter)
+		g_bSpeedKeyCounter--;
+
+	if (g_bIddleCounter)
+		g_bIddleCounter--;
 }
 
 
