@@ -214,11 +214,8 @@ void main()
 						LCD_PrCString(gBlankStr);
 						LCD_Position(ROW_SWR, COL_SWR);
 						DISP_Swr(gwSwr);
-						if (gwSwr<SWR_MAX)
-						{
-							LCD_Position(ROW_IMP, COL_IMP);
-							DISP_Impedance(gwZ);
-						}
+						LCD_Position(ROW_IMP, COL_IMP);
+						DISP_Impedance(gwZ);
 						break;
 
 					case MODE_IMP:
@@ -250,44 +247,25 @@ void main()
 							LCD_PrCString(gBlankStr);
 							LCD_Position(ROW_SWR, COL_SWR);
 							DISP_Swr(gwSwr);
-							if (gwSwr<SWR_MAX)
-							{
-								LCD_Position(ROW_IMP, COL_IMP);
-								DISP_ImpedanceComplex(gwR, gwX, bSign);
-							}
+							LCD_Position(ROW_IMP, COL_IMP);
+							DISP_ImpedanceComplex(gwR, gwX, bSign);
 						}
 						break;
 
 					case MODE_CAP:
 						LCD_Position(ROW_SWR, 0);
 						LCD_PrCString(gBlankStr);
-						if (gwSwr<SWR_MAX)
-						{
-							LCD_Position(ROW_C, COL_C);
-							gwC = Calculate_C(gwX, dwCurrentFreq);
-							DISP_Capacitance(gwC);
-						}
-						else
-						{
-							LCD_Position(ROW_SWR, 0);
-							LCD_PrCString(gErrorOverflowStr);
-						}
+						LCD_Position(ROW_C, COL_C);
+						gwC = Calculate_C(gwX, dwCurrentFreq);
+						DISP_Capacitance(gwC);
 						break;
 
 					case MODE_IND:
 						LCD_Position(ROW_SWR, 0);
 						LCD_PrCString(gBlankStr);
-						if (gwSwr<SWR_MAX)
-						{
-							LCD_Position(ROW_L, COL_L);
-							gwL = Calculate_L(gwX, dwCurrentFreq);
-							DISP_Inductance(gwL);
-						}
-						else
-						{
-							LCD_Position(ROW_SWR, 0);
-							LCD_PrCString(gErrorOverflowStr);
-						}
+						LCD_Position(ROW_L, COL_L);
+						gwL = Calculate_L(gwX, dwCurrentFreq);
+						DISP_Inductance(gwL);
 						break;
 
 					default:

@@ -233,7 +233,7 @@ static void Cmd_On (void)
 	{
 		DDS_Set(gdwCurrentFreq);
 		UART_CPutString(gszOk);
-	}		
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -320,19 +320,12 @@ static void Cmd_Imp (void)
 	gwR = Calculate_R(gwZ, gwSwr);
 	gwX = Calculate_X(gwZ, gwR);
 
-	if (gwSwr>=SWR_MAX)
-	{
-		gwZ = 9999;
-		gwR = 9999;
-		gwX = 9999;
-	}
-	
 	itoa(szMsg, gwSwr, 10);
 	UART_PutChar( szMsg[0] );
 	UART_PutChar( '.' );
 	UART_PutChar( szMsg[1] );
 	UART_PutChar( szMsg[2] );
-	
+
 	UART_PutChar(',');
 	itoa(szMsg, gwR, 10);
 	UART_PutString(szMsg);
@@ -344,7 +337,7 @@ static void Cmd_Imp (void)
 	UART_PutChar(',');
 	itoa(szMsg, gwZ, 10);
 	UART_PutString(szMsg);
-	
+
 	UART_PutCRLF();
 }
 

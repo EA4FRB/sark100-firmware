@@ -140,8 +140,6 @@ BYTE const g150OhmLoadStr		[] = "Conn 150 \xf4 load ";
 BYTE const gErrorUncalibratedStr[] = "Uncalibrated !! ";
 BYTE const gPressAnyKeyStr		[] = "Press any key";
 
-BYTE const gErrorOverflowStr	[] = ">>>";
-
 BYTE const gNotImplementedStr	[] = "Not Implemented";
 
 BYTE const gConfirmStr			[] = "Confirm ?";

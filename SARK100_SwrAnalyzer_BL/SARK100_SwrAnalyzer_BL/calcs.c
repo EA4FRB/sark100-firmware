@@ -75,18 +75,18 @@ WORD Calculate_Swr (DWORD dwVf, DWORD dwVr)
 	DWORD dwDenominator;
 	DWORD dwNumerator;
 	WORD wSwr;
-	
+
 	if (dwVf>dwVr)
 		dwDenominator = dwVf-dwVr;
 	else
-		dwDenominator = 1;		
+		dwDenominator = 1;
 
 	dwNumerator = (dwVf+dwVr)*100;
 
 	wSwr = (dwNumerator/dwDenominator);
 	if (wSwr > SWR_MAX)
 		wSwr = SWR_MAX;
-		
+
 	return wSwr;
 }
 
@@ -110,14 +110,14 @@ WORD Calculate_Swr (DWORD dwVf, DWORD dwVr)
 WORD Calculate_Z (DWORD dwVz, DWORD dwVa)
 {
 	WORD wZ;
-	
+
 	if (dwVa == 0)						// Avoids divide by zero
 		dwVa = 1;
 
 	wZ = ((DWORD)(dwVz * (DWORD)50))/dwVa;
-	if (wZ > 9999)
-		wZ = 9999;
-		
+	if (wZ > 2000)
+		wZ = 2000;
+
 	return wZ;
 }
 
@@ -150,8 +150,6 @@ WORD Calculate_R (WORD wZ, WORD wSwr)
 	dwNumerator = (((DWORD)wZ*wZ) + 2500) * (DWORD)wSwr;
 
 	wR = dwNumerator/dwDenominator;
-	if (wR>9999)
-		wR = 9999;
 
 	return wR;
 }
@@ -177,14 +175,13 @@ WORD Calculate_X (WORD wZ, WORD wR)
 {
 	DWORD dwTemp;
 	WORD wX;
-	
+
 	dwTemp = ((DWORD)wZ*wZ)-((DWORD)wR*wR);
 	if ((signed long)dwTemp<0)
 		return 0;
 
 	wX = Calc_Sqrt(dwTemp);
-	if (wX > 9999)
-		wX = 9999;
+
 	return wX;
 }
 
@@ -280,6 +277,29 @@ static WORD Calc_Sqrt (DWORD dwN)
 	}
 	return (WORD)(dwRoot>>1);
 }
+
+#if 0
+//-----------------------------------------------------------------------------
+//  FUNCTION NAME:	Calculate_PhaseAngle
+//
+//  DESCRIPTION:
+//
+//	Calculates phase angle
+//	angle = atan(X/R)*180/PI
+//
+//  ARGUMENTS:
+//     	wX
+//		wR
+//
+//  RETURNS:
+//     Angle
+//
+//-----------------------------------------------------------------------------
+BYTE Calculate_PhaseAngle (WORD wX, WORD wR)
+{
+	//@TODO: Solve with lookup table
+}
+#endif
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

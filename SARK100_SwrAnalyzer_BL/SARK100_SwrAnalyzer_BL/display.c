@@ -120,7 +120,7 @@ void DISP_Swr ( WORD wSwr )
 
 	if (wSwr>=SWR_MAX)
 	{
-		LCD_PrCString(gErrorOverflowStr);
+		LCD_PrCString(">10");
 		return;
 	}
 	itoa(szSwr, wSwr, 10);
@@ -232,10 +232,18 @@ void DISP_Impedance ( WORD wZ )
 {
 	char szZ[16];
 
+
 	LCD_PrCString("Z = ");
-	itoa(szZ, wZ, 10);
-	LCD_PrString(szZ);
-	LCD_PrCString(" \xf4");
+	if (wZ>2000)
+	{
+		LCD_PrCString(">2000");
+	}
+	else
+	{
+		itoa(szZ, wZ, 10);
+		LCD_PrString(szZ);
+		LCD_PrCString(" \xf4");
+	}
 }
 
 //-----------------------------------------------------------------------------

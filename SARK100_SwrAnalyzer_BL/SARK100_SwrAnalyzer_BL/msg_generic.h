@@ -78,8 +78,6 @@ extern BYTE const g150OhmLoadStr[];
 extern BYTE const gErrorUncalibratedStr[];
 extern BYTE const gPressAnyKeyStr[];
 
-extern BYTE const gErrorOverflowStr[];
-
 extern BYTE const gNotImplementedStr[];
 
 extern BYTE const gConfirmStr[];
