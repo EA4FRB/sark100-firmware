@@ -104,7 +104,7 @@ void main()
 	DWORD dwScanFreq;
 	BYTE bMode = MODE_SWR;
 	BYTE bBand = BAND_30M;
-	BYTE bKey;
+	BYTE bKey = 0;
 	BYTE ii;
 	BYTE bUserIddle;
 
@@ -193,7 +193,8 @@ void main()
 		DISP_Frequency(dwCurrentFreq);
 		do
 		{
-			if (bMode != MODE_OFF)
+										// If frequency is scrolled fast it does not measure
+			if ((bMode != MODE_OFF)&&!((bKey==KBD_2xUP)||(bKey==KBD_2xDWN)))
 			{
 										// Set frequency, measure, and deactivate
 				DDS_Set(dwCurrentFreq);

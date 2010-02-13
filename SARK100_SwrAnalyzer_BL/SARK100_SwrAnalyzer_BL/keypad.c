@@ -75,34 +75,42 @@ BYTE KEYPAD_Get ( void )
 {
 	BYTE bKey;
 	static BYTE bLastKey = 0;
-	
+
 	if (g_bDebounceCounter!=0)
 		return 0;
 
 	bKey = KEYPAD_Scan();
 	if (bKey != KEYPAD_Scan())
 		bKey = 0;
-			
+
 	if (bKey)
 	{
 		BUZZ_KeyClick();
 		g_bDebounceCounter = KEY_DEBOUNCE_TIME;
-		
+
 		if (bKey==bLastKey)
 		{
 			if (g_bSpeedKeyCounter == 0)
 			{
 				if (bKey == KBD_UP)
+				{
+										// Debouncing not needed for faster scan
+					g_bDebounceCounter = 0;
 					bKey = KBD_2xUP;
+				}
 				else if (bKey == KBD_DWN)
+				{
+										// Debouncing not needed for faster scan
+					g_bDebounceCounter = 0;
 					bKey = KBD_2xDWN;
-			}	
+				}
+			}
 		}
 		else
 		{
 			g_bSpeedKeyCounter = SPEED_KEY_DET_TIME_S;
 			bLastKey = bKey;
-		}	
+		}
 	}
 	else
 		bLastKey = 0;
