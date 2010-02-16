@@ -112,7 +112,7 @@ typedef enum {							// Band values
 	BAND_30M,
 	BAND_25M,
 	BAND_20M,
-	BAND_18M,
+	BAND_17M,
 	BAND_15M,
 	BAND_12M,
 	BAND_10M,
