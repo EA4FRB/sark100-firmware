@@ -110,6 +110,7 @@ BYTE const gBand20MStr    [] = "20M";
 BYTE const gBand17MStr    [] = "17M";
 BYTE const gBand15MStr    [] = "15M";
 BYTE const gBand12MStr    [] = "12M";
+BYTE const gBand11MStr    [] = "11M";
 BYTE const gBand10MStr    [] = "10M";
 BYTE const gBand6MStr	  [] = "6M";
 BYTE const *gBandStr[] = {
@@ -122,6 +123,7 @@ BYTE const *gBandStr[] = {
 							gBand17MStr,
 							gBand15MStr,
 							gBand12MStr,
+							gBand11MStr,
 							gBand10MStr,
 							gBand6MStr
 							};
