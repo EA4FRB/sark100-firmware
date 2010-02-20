@@ -79,11 +79,10 @@ typedef enum {							// Mode menu
 	MODE_IMP,
 	MODE_CAP,
 	MODE_IND,
+	MODE_VFO,
 	MODE_OFF,
 
-	MODE_MAX,
-
-	MODE_VFO							// Mode VFO not available yet
+	MODE_MAX
 } MODE_DEFS;
 
 typedef enum {							// Step values

@@ -135,7 +135,7 @@ void main()
 		LCD_Position(1, 0);
 		LCD_PrCString(gPressAnyKeyStr);
 										// Wait key press
-		KEYPAD_WaitKey(TIME_WAIT_KEY_S);
+		KEYPAD_WaitKey(TIME_DELAY_TEXT);
 		DISP_Clear();
 	}
 
@@ -198,15 +198,18 @@ void main()
 			{
 										// Set frequency, measure, and deactivate
 				DDS_Set(dwCurrentFreq);
-				Delay_Ms(200);
-				Do_Measure();
-				DDS_Set(0);
-										// Do the basic calcs
-				gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
-				gwZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
-				gwR = Calculate_R(gwZ, gwSwr);
-				gwX = Calculate_X(gwZ, gwR);
 
+				if (bMode != MODE_VFO)	// Does not measure in VFO mode
+				{
+					Delay_Ms(200);
+					Do_Measure();
+					DDS_Set(0);
+											// Do the basic calcs
+					gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
+					gwZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
+					gwR = Calculate_R(gwZ, gwSwr);
+					gwX = Calculate_X(gwZ, gwR);
+				}
 										// Display data depending mode
 				switch (bMode)
 				{
@@ -269,6 +272,7 @@ void main()
 						DISP_Inductance(gwL);
 						break;
 
+					case MODE_VFO:		// Does nothing
 					default:
 						break;
 				}

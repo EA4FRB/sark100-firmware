@@ -73,8 +73,8 @@ BYTE const *gModeStr[] = {
 							gModeImpStr,
 							gModeCapStr,
 							gModeIndStr,
-							gModeOffStr,
-							gModeVfoStr
+							gModeVfoStr,
+							gModeOffStr
 							};
 
 BYTE const gStep10HzStr   [] = "10Hz";
