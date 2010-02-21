@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <PSOC_WND_PERSIST>
   <APP_EDITOR_SETTINGS>
-    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL.soc" />
-    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL.cmx" />
   </APP_EDITOR_SETTINGS>
   <DEBUGGER_SETTINGS>
     <TRACE_MODE VALUE="PCOnly" />
