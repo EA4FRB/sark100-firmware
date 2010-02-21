@@ -103,7 +103,7 @@ void main()
 	DWORD dwCurrentFreq;
 	DWORD dwScanFreq;
 	BYTE bMode = MODE_SWR;
-	BYTE bBand = BAND_30M;
+	BYTE bBand = BAND_20M;
 	BYTE bKey = 0;
 	BYTE ii;
 	BYTE bUserIddle;
