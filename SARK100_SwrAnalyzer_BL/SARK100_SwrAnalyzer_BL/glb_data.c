@@ -114,9 +114,10 @@ const g_bDefGainDdsIdx[BAND_MAX] =
 	3,	//BAND_30M
 	3, 	//BAND_25M
 	3,	//BAND_20M
-	4,	//BAND_18M
+	4,	//BAND_17M
 	4,	//BAND_15M
 	5,	//BAND_12M
+	5,	//BAND_11M
 	6,	//BAND_10M
 	10	//BAND_6M
 };

@@ -51,6 +51,8 @@
 #include "display.h"
 #include "calibrate_reflectometer.h"
 
+//#define DEBUG	1
+
 //-----------------------------------------------------------------------------
 //  Defines
 //-----------------------------------------------------------------------------
@@ -73,9 +75,17 @@
 void Calibrate_Reflectometer (void)
 {
 	BYTE bBand;
-	BYTE bErrorVf = FALSE;
+#ifdef DEBUG
+	BYTE szMsg[20];
+#endif
 										//@TODO: Save values in case of cancelation
-
+#ifdef DEBUG
+	UART_CmdReset(); 					// Initialize receiver/cmd buffer
+	UART_IntCntl(UART_ENABLE_RX_INT); 	// Enable RX interrupts
+	UART_Start(UART_PARITY_NONE); 		// Enable UART
+	M8C_EnableGInt ;
+	UART_PutChar(12); 					// Clear the screen
+#endif
 										// Set default correction factors
 	g_xBridgeCorrect.Vf = 100;
 	g_xBridgeCorrect.Vz = 1;
@@ -117,12 +127,37 @@ void Calibrate_Reflectometer (void)
 		Do_Measure();
 		g_xBridgeOffset = g_xBridgeMeasure;
 
+#ifdef DEBUG
+		UART_CPutString("Offset, VF=");
+		ltoa(szMsg, g_xBridgeOffset.Vf, 10);
+		UART_PutString(szMsg);
+		UART_CPutString(", VR=");
+		ltoa(szMsg, g_xBridgeOffset.Vr, 10);
+		UART_PutString(szMsg);
+		UART_CPutString(", VA=");
+		ltoa(szMsg, g_xBridgeOffset.Va, 10);
+		UART_PutString(szMsg);
+		UART_CPutString(", VZ=");
+		ltoa(szMsg, g_xBridgeOffset.Vz, 10);
+		UART_PutString(szMsg);
+		UART_PutCRLF();
+#endif
+
+#ifdef DEBUG
+		UART_CPutString("Gain\n\r");
+#endif
+
 										//
 										// Adjust Vf
 		for (bBand=0; bBand<BAND_MAX;bBand++)
 		{
 			BYTE bGainIdx;
 
+#ifdef DEBUG
+			UART_CPutString("Band:");
+			itoa(szMsg, bBand, 10);
+			UART_PutString(szMsg);
+#endif
 			DDS_Set(g_xBandLimits[bBand].middle * BAND_FREQ_MULT);
 			for (bGainIdx=0;bGainIdx<GAIN_SETTINGS_MAX;bGainIdx++)
 			{
@@ -130,8 +165,16 @@ void Calibrate_Reflectometer (void)
 				PGA_DDS_2_SetGain(g_xGainDds[bGainIdx].bGain2);
 				Delay_Ms(200);
 				Do_Measure();
-
-				if (g_xBridgeMeasure.Vf > (VF_REFERENCE_LEVEL-g_xBridgeOffset.Vf))
+#ifdef DEBUG
+				UART_CPutString(", Gain=");
+				itoa(szMsg, bGainIdx, 10);
+				UART_PutString(szMsg);
+				UART_CPutString(", VF=");
+				ltoa(szMsg, g_xBridgeMeasure.Vf, 10);
+				UART_PutString(szMsg);
+				UART_PutCRLF();
+#endif
+				if (g_xBridgeMeasure.Vf >= (VF_REFERENCE_LEVEL-g_xBridgeOffset.Vf))
 				{
 					g_bGainDDS[bBand] = bGainIdx;
 					break;
@@ -139,23 +182,9 @@ void Calibrate_Reflectometer (void)
 			}
 			if (bGainIdx==GAIN_SETTINGS_MAX)
 			{
-				bErrorVf = TRUE;
+				g_bGainDDS[bBand] = GAIN_SETTINGS_MAX-1;
 				break;
 			}
-		}
-									// Err in Vf value: mostly a hw error
-		if (bErrorVf)
-		{
-			BUZZ_BeepError();
-
-			LCD_Position(0, 0);
-			LCD_PrCString(gErrorAdjustVfStr);
-			LCD_Position(1, 0);
-			LCD_PrCString(gPressAnyKeyStr);
-										// Wait key press
-			KEYPAD_WaitKey(TIME_WAIT_KEY_S);
-			DISP_Clear();
-			break;
 		}
 										//
 										// 50ohm load
@@ -172,6 +201,9 @@ void Calibrate_Reflectometer (void)
 		LCD_Position(1, 0);
 		LCD_PrCString(gInProgressStr);
 
+#ifdef DEBUG
+		UART_CPutString("Load 50\n\r");
+#endif
 										// At each band frequency, ...
         								// Determine correction factor for Vz and Va to be 1/2 Vf (using 50-ohm load)
 		for (bBand=0; bBand<BAND_MAX;bBand++)
@@ -184,8 +216,24 @@ void Calibrate_Reflectometer (void)
 
 			g_xBandCorrFactor[bBand].Vz = (g_xBridgeMeasure.Vf*100)/(2*g_xBridgeMeasure.Vz);
 			g_xBandCorrFactor[bBand].Va = (g_xBridgeMeasure.Vf*100)/(2*g_xBridgeMeasure.Va);
+#ifdef DEBUG
+			UART_CPutString("Band:");
+			itoa(szMsg, bBand, 10);
+			UART_PutString(szMsg);
+			UART_CPutString(", CorrVZ=");
+			ltoa(szMsg, g_xBandCorrFactor[bBand].Vz, 10);
+			UART_PutString(szMsg);
+			UART_CPutString(", CorrVA=");
+			ltoa(szMsg, g_xBandCorrFactor[bBand].Va, 10);
+			UART_PutString(szMsg);
+
+			UART_PutCRLF();
+#endif
         }
 
+#ifdef DEBUG
+		UART_CPutString("Load 150\n\r");
+#endif
 										// 150ohm load
 		LCD_Position(0, 0);
 		LCD_PrCString(gConfigCalibStr);
@@ -210,6 +258,16 @@ void Calibrate_Reflectometer (void)
 			Do_Measure();
 
 			g_xBandCorrFactor[bBand].Vr = (g_xBridgeMeasure.Vf*100)/(2*g_xBridgeMeasure.Vr);
+#ifdef DEBUG
+			UART_CPutString("Band:");
+			itoa(szMsg, bBand, 10);
+			UART_PutString(szMsg);
+			UART_CPutString(", CorrVR=");
+			ltoa(szMsg, g_xBandCorrFactor[bBand].Vr, 10);
+			UART_PutString(szMsg);
+
+			UART_PutCRLF();
+#endif
         }
 
 										// Store data
@@ -226,6 +284,10 @@ void Calibrate_Reflectometer (void)
 		KEYPAD_WaitKey(TIME_WAIT_KEY_S);
 	}
 	while (FALSE);
+
+#ifdef DEBUG
+	UART_Stop();
+#endif
 }
 
 //-----------------------------------------------------------------------------
