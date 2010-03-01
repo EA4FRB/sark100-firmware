@@ -83,6 +83,7 @@ BAND_LIMITS const g_xBandLimits[BAND_MAX] =
 	{230,249,260},	//12m
 	{260,270,280},	//11m
 	{280,290,310},	//10m
+	{310,400,490},	//8m
 	{490,510,530}	//6M
 };
 
@@ -119,6 +120,7 @@ const g_bDefGainDdsIdx[BAND_MAX] =
 	5,	//BAND_12M
 	5,	//BAND_11M
 	6,	//BAND_10M
+	6,	//BAND_8M
 	10	//BAND_6M
 };
 
