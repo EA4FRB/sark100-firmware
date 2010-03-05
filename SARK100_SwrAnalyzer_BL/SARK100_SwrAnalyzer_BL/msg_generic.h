@@ -72,8 +72,10 @@ extern BYTE const gInProgressStr[];
 extern BYTE const gDoneStr[];
 
 extern BYTE const gOpenLoadStr[];
+extern BYTE const gShortLoadStr[];
 extern BYTE const g50OhmLoadStr[];
 extern BYTE const g150OhmLoadStr[];
+extern BYTE const g274OhmLoadStr[];
 
 extern BYTE const gErrorUncalibratedStr[];
 extern BYTE const gPressAnyKeyStr[];

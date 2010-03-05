@@ -109,7 +109,7 @@ GAIN_DDS const g_xGainDds[GAIN_SETTINGS_MAX] =
 										// Default PGA DDS gain index table
 const g_bDefGainDdsIdx[BAND_MAX] =
 {
-	1,	//BAND_160M
+	2,	//BAND_160M
 	2,	//BAND_80M
 	2,	//BAND_40M
 	3,	//BAND_30M
@@ -120,7 +120,7 @@ const g_bDefGainDdsIdx[BAND_MAX] =
 	5,	//BAND_12M
 	6,	//BAND_11M
 	6,	//BAND_10M
-	7,	//BAND_8M
+	8,	//BAND_8M
 	10	//BAND_6M
 };
 
