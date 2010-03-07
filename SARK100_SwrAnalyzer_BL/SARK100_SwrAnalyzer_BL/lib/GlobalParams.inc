@@ -86,9 +86,9 @@ AGND_BYPASS_JUST:			equ	0h	;AGndBypass setting justified
 SYSCLK_SOURCE:				equ	(0h | 0h)	;SysClk Source setting
 SYSCLK_SOURCE_MASK:			equ	(4h | 2h)	;SysClk Source setting mask
 SYSCLK_SOURCE_JUST:			equ	(0h | 0h)	;SysClk Source setting justified
-SYSCLK_2_DISABLE:				equ	0h	;SysClk*2 Disable setting
+SYSCLK_2_DISABLE:				equ	1h	;SysClk*2 Disable setting
 SYSCLK_2_DISABLE_MASK:			equ	1h	;SysClk*2 Disable setting mask
-SYSCLK_2_DISABLE_JUST:			equ	0h	;SysClk*2 Disable setting justified
+SYSCLK_2_DISABLE_JUST:			equ	1h	;SysClk*2 Disable setting justified
 ;
 ; register initial values
 ;

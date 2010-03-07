@@ -57,9 +57,9 @@
 #define SYSCLK_SOURCE          (0x0 | 0x0) // SysClk Source setting
 #define SYSCLK_SOURCE_MASK     (0x4 | 0x2) // SysClk Source setting mask
 #define SYSCLK_SOURCE_JUST     (0x0 | 0x0) // SysClk Source setting justified
-#define SYSCLK_2_DISABLE       0x0     // SysClk*2 Disable setting
+#define SYSCLK_2_DISABLE       0x1     // SysClk*2 Disable setting
 #define SYSCLK_2_DISABLE_MASK  0x1     // SysClk*2 Disable setting mask
-#define SYSCLK_2_DISABLE_JUST  0x0     // SysClk*2 Disable setting justified
+#define SYSCLK_2_DISABLE_JUST  0x1     // SysClk*2 Disable setting justified
 //
 // register initial values
 //

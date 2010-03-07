@@ -163,7 +163,7 @@ LoadConfigTBL_sark100_swranalyzer_bl_Bank1:
 	db		d0h, 00h		; GlobalDigitalInterconnect_Drive_Odd_Input register (GDI_O_IN)
 	db		d2h, 00h		; GlobalDigitalInterconnect_Drive_Odd_Output register (GDI_O_OU)
 	db		e1h, 3fh		; OscillatorControl_1 register (OSC_CR1)
-	db		e2h, 00h		; OscillatorControl_2 register (OSC_CR2)
+	db		e2h, 01h		; OscillatorControl_2 register (OSC_CR2)
 	db		dfh, 33h		; OscillatorControl_3 register (OSC_CR3)
 	db		deh, 00h		; OscillatorControl_4 register (OSC_CR4)
 	db		ddh, 00h		; OscillatorGlobalBusEnableControl register (OSC_GO_EN)
