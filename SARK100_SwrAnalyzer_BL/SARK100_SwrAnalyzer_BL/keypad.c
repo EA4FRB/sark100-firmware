@@ -122,7 +122,8 @@ BYTE KEYPAD_Get ( void )
 //
 //  DESCRIPTION:
 //
-//	Waits for key or delay
+//	Waits for key or delay.
+//	Implements power saving features
 //
 //  ARGUMENTS:
 //    bDelayS	Wait timeout in seconds
@@ -134,7 +135,9 @@ BYTE KEYPAD_Get ( void )
 BYTE KEYPAD_WaitKey ( BYTE bDelayS )
 {
 	BYTE bKey;
-
+										// Actions to minimize power consumption
+	OSC_CR0 &= ~0x07; 					// Clear Bits 0 to 2
+	OSC_CR0 |= 0x05; 					// Sets CPU clock to 750Khz
 	g_bIddleCounter = bDelayS;
 	do
 	{
@@ -146,10 +149,43 @@ BYTE KEYPAD_WaitKey ( BYTE bDelayS )
 				break;
 		}
 	} while (bKey == 0);
+	OSC_CR0 &= ~0x07; 					// Clear Bits 0 to 2
+	OSC_CR0 |= 0x03;  					// Set CPU Clock to SysClk/1
 
 	return bKey;
 }
 
+#if 0
+BYTE KEYPAD_WaitKey ( BYTE bDelayS )
+{
+	BYTE bKey;
+	BYTE bCount1S;
+										// Actions to minimize power consumption
+										// Reduces CPU clock frequency
+	OSC_CR0 &= ~0x07; 					// Clear Bits 0 to 2
+	OSC_CR0 |= 0x05; 					// Sets CPU clock to 705Khz
+//	OSC_CR0 |= 0x18; 					// Changes sleep interval to 1s
+	
+	bCount1S = bDelayS;
+	do
+	{
+		M8C_Sleep;
+		bKey = KEYPAD_Get();
+		if (bDelayS)
+		{
+			if (--bCount1S==0)
+				break;
+		}
+	} while (bKey == 0);
+										// Restores CPU normal operation
+//	OSC_CR0 &= ~0x08; 					// Restores sleep interval to 1/8s
+										// Sets CPU clock freq to max freq
+	OSC_CR0 &= ~0x07; 					// Clear Bits 0 to 2
+	OSC_CR0 |= 0x03;  					// Set CPU Clock to SysClk/1
+
+	return bKey;
+}
+#endif
 //-----------------------------------------------------------------------------
 //  FUNCTION NAME:	KEYPAD_Scan
 //

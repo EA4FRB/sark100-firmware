@@ -57,7 +57,7 @@
 //  Defines
 //-----------------------------------------------------------------------------
 #define DIZZLING_FREQ		1000000		//1Mhz
-#define TIME_DELAY_TEXT		4			//Temporary screen texts: units of 1/8 sec
+#define TIME_DELAY_TEXT		4			//Temporary screen texts: units of 1 sec
 
 										//Text coordinates
 #define COL_MODE			0
@@ -418,7 +418,9 @@ void main()
 				LCD_Init();
 				LCD_Control(LCD_OFF);	// Display off
 
+				OSC_CR0 |= 0x18; 		// Changes sleep interval to 1s
 				KEYPAD_WaitKey(0);		// Waits for a key press
+				OSC_CR0 &= ~0x08; 		// Restores sleep interval to 1/8s
 
 										// Resumes
 				LCD_Control(LCD_ON);	// Display on

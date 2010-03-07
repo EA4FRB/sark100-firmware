@@ -138,8 +138,10 @@ BYTE const gInProgressStr		[] = "In progress...";
 BYTE const gDoneStr				[] = "Done          ";
 
 BYTE const gOpenLoadStr			[] = "Disconnect Load ";
+BYTE const gShortLoadStr		[] = "Short-circuit";
 BYTE const g50OhmLoadStr		[] = "Conn 50 \xf4 load  ";
 BYTE const g150OhmLoadStr		[] = "Conn 150 \xf4 load ";
+BYTE const g274OhmLoadStr		[] = "Conn 274 \xf4 load ";
 
 BYTE const gErrorUncalibratedStr[] = "Uncalibrated !! ";
 BYTE const gPressAnyKeyStr		[] = "Press any key";

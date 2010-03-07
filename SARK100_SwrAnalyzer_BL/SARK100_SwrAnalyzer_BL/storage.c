@@ -154,7 +154,7 @@ void STR_Restore ( void )
 
 		STR_SaveCalibration();
 
-		g_xConf.bUserIddle = USER_IDDLE_30S;
+		g_xConf.bUserIddle = USER_IDDLE_90S;
 		g_xConf.bStep = STEP_10KHZ;
 		STR_SaveConfig();
 
