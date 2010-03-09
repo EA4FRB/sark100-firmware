@@ -3,7 +3,13 @@
   <APP_EDITOR_SETTINGS>
     <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL.soc" />
     <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL.cmx" />
-    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\util.c" ACTIVE="true" />
+    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\util.c" />
+    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\storage.c" />
+    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\keypad.c" />
+    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\main.c" />
+    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\sleep_timer.c" />
+    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\calibrate_reflectometer.c" />
+    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\glb_data.h" />
   </APP_EDITOR_SETTINGS>
   <DEBUGGER_SETTINGS>
     <TRACE_MODE VALUE="PCOnly" />
