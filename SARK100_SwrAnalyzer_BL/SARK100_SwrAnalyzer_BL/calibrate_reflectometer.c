@@ -59,7 +59,7 @@
 //-----------------------------------------------------------------------------
 #define VF_REFERENCE_LEVEL	4000		// Full scale value
 #define SWR_274_LOAD		548			// Expected SWR at 274-ohm load
-#define MAX_ITER_SWR		50			// Maximum number of iterations looking for best SWR
+#define MAX_ITER_SWR		100			// Maximum number of iterations looking for best SWR
 
 //-----------------------------------------------------------------------------
 //  FUNCTION NAME:	Calibrate_Reflectometer()
@@ -79,7 +79,7 @@ void Calibrate_Reflectometer (void)
 {
 	BYTE bBand;
 										// Set default correction factors
-	g_xBridgeCorrect.Vf = 100;
+	g_xBridgeCorrect.Vf = CORRECTION_FACTOR;
 	g_xBridgeCorrect.Vz = 1;
 	g_xBridgeCorrect.Vr = 1;
 	g_xBridgeCorrect.Va = 1;
@@ -145,7 +145,7 @@ void Calibrate_Reflectometer (void)
 				break;
 			}
 		}
-#if 1		
+#if 1
 										//
 										// 50ohm load
 		LCD_Position(0, 0);
@@ -167,12 +167,12 @@ void Calibrate_Reflectometer (void)
 		{
 			Adjust_Dds_Gain(bBand);
 			DDS_Set(g_xBandLimits[bBand].middle * BAND_FREQ_MULT);
-			Delay_Ms(200);
+			Delay_Ms(400);
 
 			Do_Measure();
 
-			g_xBandCorrFactor[bBand].Vz = (g_xBridgeMeasure.Vf*100)/(2*g_xBridgeMeasure.Vz);
-			g_xBandCorrFactor[bBand].Va = (g_xBridgeMeasure.Vf*100)/(2*g_xBridgeMeasure.Va);
+			g_xBandCorrFactor[bBand].Vz = (g_xBridgeMeasure.Vf*CORRECTION_FACTOR)/(2*g_xBridgeMeasure.Vz);
+			g_xBandCorrFactor[bBand].Va = (g_xBridgeMeasure.Vf*CORRECTION_FACTOR)/(2*g_xBridgeMeasure.Va);
         }
 #endif
 #if 0
@@ -196,12 +196,12 @@ void Calibrate_Reflectometer (void)
 		{
 			Adjust_Dds_Gain(bBand);
 			DDS_Set(g_xBandLimits[bBand].middle * BAND_FREQ_MULT);
-			Delay_Ms(200);
+			Delay_Ms(400);
 
 			Do_Measure();
 
-			g_xBandCorrFactor[bBand].Vz = (g_xBridgeMeasure.Vf*100*3)/(4*g_xBridgeMeasure.Vz);
-			g_xBandCorrFactor[bBand].Va = (g_xBridgeMeasure.Vf*100)/(4*g_xBridgeMeasure.Va);
+			g_xBandCorrFactor[bBand].Vz = (g_xBridgeMeasure.Vf*CORRECTION_FACTOR*3)/(4*g_xBridgeMeasure.Vz);
+			g_xBandCorrFactor[bBand].Va = (g_xBridgeMeasure.Vf*CORRECTION_FACTOR)/(4*g_xBridgeMeasure.Va);
         }
 #endif
 										// 274ohm load
@@ -223,12 +223,12 @@ void Calibrate_Reflectometer (void)
 		for (bBand=0; bBand<BAND_MAX;bBand++)
 		{
 			BYTE ii;
-			
-			g_xBandCorrFactor[bBand].Vr = 100;
+
+			g_xBandCorrFactor[bBand].Vr = CORRECTION_FACTOR;
 			g_xBridgeCorrect = g_xBandCorrFactor[bBand];
 			Adjust_Dds_Gain(bBand);
 			DDS_Set(g_xBandLimits[bBand].middle * BAND_FREQ_MULT);
-			Delay_Ms(200);
+			Delay_Ms(400);
 			for (ii=0;ii<MAX_ITER_SWR;ii++)
 			{
 				Do_Measure();
@@ -239,7 +239,7 @@ void Calibrate_Reflectometer (void)
 					g_xBridgeCorrect.Vr--;
 				else
 					g_xBridgeCorrect.Vr++;
-			}						
+			}
 			g_xBandCorrFactor[bBand] = g_xBridgeCorrect;
         }
 
@@ -293,11 +293,11 @@ void Calibrate_Reflectometer (void)
 		UART_CPutString(", Gain=");
 		itoa(szMsg, g_bGainDDS[bBand], 10);
 		UART_PutString(szMsg);
-		
+
 		UART_CPutString(", CorrVR=");
 		ltoa(szMsg, g_xBandCorrFactor[bBand].Vr, 10);
 		UART_PutString(szMsg);
-		
+
 		UART_CPutString(", CorrVZ=");
 		ltoa(szMsg, g_xBandCorrFactor[bBand].Vz, 10);
 		UART_PutString(szMsg);
@@ -307,9 +307,9 @@ void Calibrate_Reflectometer (void)
 		UART_PutString(szMsg);
 
 		UART_PutCRLF();
-	}	
+	}
 	UART_Stop();
-}	
+}
 #endif
 }
 

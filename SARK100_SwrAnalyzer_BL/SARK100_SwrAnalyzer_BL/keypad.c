@@ -155,37 +155,6 @@ BYTE KEYPAD_WaitKey ( BYTE bDelayS )
 	return bKey;
 }
 
-#if 0
-BYTE KEYPAD_WaitKey ( BYTE bDelayS )
-{
-	BYTE bKey;
-	BYTE bCount1S;
-										// Actions to minimize power consumption
-										// Reduces CPU clock frequency
-	OSC_CR0 &= ~0x07; 					// Clear Bits 0 to 2
-	OSC_CR0 |= 0x05; 					// Sets CPU clock to 705Khz
-//	OSC_CR0 |= 0x18; 					// Changes sleep interval to 1s
-	
-	bCount1S = bDelayS;
-	do
-	{
-		M8C_Sleep;
-		bKey = KEYPAD_Get();
-		if (bDelayS)
-		{
-			if (--bCount1S==0)
-				break;
-		}
-	} while (bKey == 0);
-										// Restores CPU normal operation
-//	OSC_CR0 &= ~0x08; 					// Restores sleep interval to 1/8s
-										// Sets CPU clock freq to max freq
-	OSC_CR0 &= ~0x07; 					// Clear Bits 0 to 2
-	OSC_CR0 |= 0x03;  					// Set CPU Clock to SysClk/1
-
-	return bKey;
-}
-#endif
 //-----------------------------------------------------------------------------
 //  FUNCTION NAME:	KEYPAD_Scan
 //
@@ -242,4 +211,65 @@ static BYTE KEYPAD_Scan ( void )
 	COL2_Data_ADDR |= COL2_MASK;
 
 	return bKey;
+}
+
+//-----------------------------------------------------------------------------
+//  FUNCTION NAME:	KEYPAD_SysSuspend
+//
+//  DESCRIPTION:
+//
+//	System suspend. Wakes up from a key press
+//
+//  ARGUMENTS:
+//    none.
+//
+//  RETURNS:
+//    Key pressed. Zero if no key.
+//
+//-----------------------------------------------------------------------------
+void KEYPAD_SysSuspend ( void )
+{
+	BYTE bSave_ARF_CR;
+	BYTE bSave_ABF_CR0;
+
+	M8C_DisableGInt;
+										// Activates all columns
+	COL0_Data_ADDR &= ~COL0_MASK;
+	COL1_Data_ADDR &= ~COL1_MASK;
+	COL2_Data_ADDR &= ~COL2_MASK;
+										// Reduces analog power
+	bSave_ARF_CR = ARF_CR;
+	bSave_ABF_CR0 = ABF_CR0;
+	ARF_CR &= 0xf8; 					// analog blocks Off
+	ABF_CR0 &= 0xc3;	 				// analog buffer off
+
+										// Set low level active interrupt
+	PRT1IC0	|= 0x3;
+	PRT1IC1	&= ~0x3;
+
+	PRT1IE	|= 0x3;						// Enables row0&row1 interrupt
+
+										// Disables sleep interrupt
+	M8C_DisableIntMask(INT_MSK0, INT_MSK0_SLEEP);
+										// Enables GPIO interrupt
+	M8C_EnableIntMask(INT_MSK0, INT_MSK0_GPIO);
+
+										// Clear Pending GPIO Interrupt
+	INT_CLR0 &= 0x20;
+
+	M8C_EnableGInt;
+
+	M8C_Sleep;							// Goes sleep
+
+	INT_VC = 0;							// Erases vector
+	
+	PRT1IE	&= ~(0x3);					// Disables row0&row1 interrupt
+
+										// Disables GPIO interrupt
+	M8C_DisableIntMask(INT_MSK0, INT_MSK0_GPIO);
+										// Restores sleep interrupt
+	M8C_EnableIntMask(INT_MSK0, INT_MSK0_SLEEP);
+
+	ARF_CR = bSave_ARF_CR;
+	ABF_CR0 = bSave_ABF_CR0;
 }

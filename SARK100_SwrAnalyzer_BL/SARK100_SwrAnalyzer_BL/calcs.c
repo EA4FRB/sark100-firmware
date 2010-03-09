@@ -109,16 +109,17 @@ WORD Calculate_Swr (DWORD dwVf, DWORD dwVr)
 //-----------------------------------------------------------------------------
 WORD Calculate_Z (DWORD dwVz, DWORD dwVa)
 {
-	WORD wZ;
+	DWORD dwZ;
 
 	if (dwVa == 0)						// Avoids divide by zero
 		dwVa = 1;
 
-	wZ = ((DWORD)(dwVz * (DWORD)50))/dwVa;
-	if (wZ > 2000)
-		wZ = 2000;
+	dwZ = ((DWORD)(dwVz * (DWORD)50))/dwVa;
 
-	return wZ;
+	if (dwZ > 2000)
+		dwZ = 2000;
+
+	return (WORD)dwZ;
 }
 
 //-----------------------------------------------------------------------------
@@ -307,10 +308,10 @@ BYTE Calculate_PhaseAngle (WORD wX, WORD wR)
 void Do_Test_Calcs ( void )
 {
 	//100 Ohm
-	g_xBridgeMeasure.Vf = 4096*100;
-	g_xBridgeMeasure.Vr = 1365*100;
-	g_xBridgeMeasure.Va = 1365*100;
-	g_xBridgeMeasure.Vz = 2731*100;
+	g_xBridgeMeasure.Vf = 4096*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vr = 1365*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Va = 1365*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vz = 2731*CORRECTION_FACTOR;
 	wSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 	wZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 	wR = Calculate_R(wZ, wSwr);
@@ -319,10 +320,10 @@ void Do_Test_Calcs ( void )
 	wL = Calculate_L(wX, dwCurrentFreq);
 
 	//50 Ohm
-	g_xBridgeMeasure.Vf = 4096*100;
-	g_xBridgeMeasure.Vr = 0*100;
-	g_xBridgeMeasure.Va = 2048*100;
-	g_xBridgeMeasure.Vz = 2048*100;
+	g_xBridgeMeasure.Vf = 4096*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vr = 0*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Va = 2048*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vz = 2048*CORRECTION_FACTOR;
 	wSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 	wZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 	wR = Calculate_R(wZ, wSwr);
@@ -331,10 +332,10 @@ void Do_Test_Calcs ( void )
 	wL = Calculate_L(wX, dwCurrentFreq);
 
 	//150 Ohm
-	g_xBridgeMeasure.Vf = 4096*100;
-	g_xBridgeMeasure.Vr = 2048*100;
-	g_xBridgeMeasure.Va = 1024*100;
-	g_xBridgeMeasure.Vz = 3072*100;
+	g_xBridgeMeasure.Vf = 4096*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vr = 2048*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Va = 1024*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vz = 3072*CORRECTION_FACTOR;
 	wSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 	wZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 	wR = Calculate_R(wZ, wSwr);
@@ -343,10 +344,10 @@ void Do_Test_Calcs ( void )
 	wL = Calculate_L(wX, dwCurrentFreq);
 
 	//0 Ohm
-	g_xBridgeMeasure.Vf = 4096*100;
-	g_xBridgeMeasure.Vr = 4096*100;
-	g_xBridgeMeasure.Va = 4096*100;
-	g_xBridgeMeasure.Vz = 0*100;
+	g_xBridgeMeasure.Vf = 4096*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vr = 4096*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Va = 4096*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vz = 0*CORRECTION_FACTOR;
 	wSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 	wZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 	wR = Calculate_R(wZ, wSwr);
@@ -356,10 +357,10 @@ void Do_Test_Calcs ( void )
 
 
 	//500 Ohm
-	g_xBridgeMeasure.Vf = 4096*100;
-	g_xBridgeMeasure.Vr = 3351*100;
-	g_xBridgeMeasure.Va = 372*100;
-	g_xBridgeMeasure.Vz = 3724*100;
+	g_xBridgeMeasure.Vf = 4096*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vr = 3351*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Va = 372*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vz = 3724*CORRECTION_FACTOR;
 	wSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 	wZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 	wR = Calculate_R(wZ, wSwr);
@@ -368,10 +369,10 @@ void Do_Test_Calcs ( void )
 	wL = Calculate_L(wX, dwCurrentFreq);
 
 	//1000 Ohm
-	g_xBridgeMeasure.Vf = 4096*100;
-	g_xBridgeMeasure.Vr = 3706*100;
-	g_xBridgeMeasure.Va = 195*100;
-	g_xBridgeMeasure.Vz = 3901*100;
+	g_xBridgeMeasure.Vf = 4096*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vr = 3706*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Va = 195*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vz = 3901*CORRECTION_FACTOR;
 	wSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 	wZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 	wR = Calculate_R(wZ, wSwr);
@@ -380,10 +381,10 @@ void Do_Test_Calcs ( void )
 	wL = Calculate_L(wX, dwCurrentFreq);
 
 	//2000 Ohm
-	g_xBridgeMeasure.Vf = 4096*100;
-	g_xBridgeMeasure.Vr = 3896*100;
-	g_xBridgeMeasure.Va = 100*100;
-	g_xBridgeMeasure.Vz = 3996*100;
+	g_xBridgeMeasure.Vf = 4096*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vr = 3896*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Va = 100*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vz = 3996*CORRECTION_FACTOR;
 	wSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 	wZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 	wR = Calculate_R(wZ, wSwr);
@@ -392,10 +393,10 @@ void Do_Test_Calcs ( void )
 	wL = Calculate_L(wX, dwCurrentFreq);
 
 	//3000 Ohm
-	g_xBridgeMeasure.Vf = 4096*100;
-	g_xBridgeMeasure.Vr = 3962*100;
-	g_xBridgeMeasure.Va = 67*100;
-	g_xBridgeMeasure.Vz = 4029*100;
+	g_xBridgeMeasure.Vf = 4096*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vr = 3962*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Va = 67*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vz = 4029*CORRECTION_FACTOR;
 	wSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 	wZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 	wR = Calculate_R(wZ, wSwr);
@@ -404,10 +405,10 @@ void Do_Test_Calcs ( void )
 	wL = Calculate_L(wX, dwCurrentFreq);
 
 	//10K Ohm
-	g_xBridgeMeasure.Vf = 4096*100;
-	g_xBridgeMeasure.Vr = 4055*100;
-	g_xBridgeMeasure.Va = 20*100;
-	g_xBridgeMeasure.Vz = 4076*100;
+	g_xBridgeMeasure.Vf = 4096*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vr = 4055*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Va = 20*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vz = 4076*CORRECTION_FACTOR;
 	wSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 	wZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 	wR = Calculate_R(wZ, wSwr);
@@ -416,10 +417,10 @@ void Do_Test_Calcs ( void )
 	wL = Calculate_L(wX, dwCurrentFreq);
 
 	//open Ohm
-	g_xBridgeMeasure.Vf = 4096*100;
-	g_xBridgeMeasure.Vr = 4096*100;
-	g_xBridgeMeasure.Va = 0*100;
-	g_xBridgeMeasure.Vz = 4096*100;
+	g_xBridgeMeasure.Vf = 4096*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vr = 4096*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Va = 0*CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vz = 4096*CORRECTION_FACTOR;
 	wSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 	wZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 	wR = Calculate_R(wZ, wSwr);

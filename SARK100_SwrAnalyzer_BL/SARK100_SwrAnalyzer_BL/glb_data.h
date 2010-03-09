@@ -54,6 +54,8 @@
 //  Defines
 //-----------------------------------------------------------------------------
 
+#define	CORRECTION_FACTOR	1000		// Correction factor used for calibration
+
 #define TIME_WAIT_KEY_S		30			// Time to wait for key when dialog, units of seconds
 
 #define	MEASURE_PERIOD		16			// Measurements sample period, units 1/8 sec

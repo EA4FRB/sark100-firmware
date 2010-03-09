@@ -164,7 +164,7 @@ void main()
 
 										// Check Vf level
 	DDS_Set(dwCurrentFreq);
-	Delay_Ms(10);
+	Delay_Ms(100);
 	Do_Measure();
 	DDS_Set(0);
 
@@ -201,7 +201,7 @@ void main()
 
 				if (bMode != MODE_VFO)	// Does not measure in VFO mode
 				{
-					Delay_Ms(200);
+					Delay_Ms(400);
 					Do_Measure();
 					DDS_Set(0);
 											// Do the basic calcs
@@ -418,10 +418,7 @@ void main()
 				LCD_Init();
 				LCD_Control(LCD_OFF);	// Display off
 
-				OSC_CR0 |= 0x18; 		// Changes sleep interval to 1s
-				KEYPAD_WaitKey(0);		// Waits for a key press
-				OSC_CR0 &= ~0x08; 		// Restores sleep interval to 1/8s
-
+				KEYPAD_SysSuspend();
 										// Resumes
 				LCD_Control(LCD_ON);	// Display on
 										// Enables DDS oscillator and backlight (shared port)

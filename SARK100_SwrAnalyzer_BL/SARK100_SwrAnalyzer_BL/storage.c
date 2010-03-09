@@ -138,10 +138,10 @@ void STR_Restore ( void )
 										// Set defaults
 		for (bBand=0;bBand<BAND_MAX;bBand++)
 		{
-			g_xBandCorrFactor[bBand].Vz = 104;
-			g_xBandCorrFactor[bBand].Vr = 106;
-			g_xBandCorrFactor[bBand].Va = 105;
-			g_xBandCorrFactor[bBand].Vf = 100;
+			g_xBandCorrFactor[bBand].Vf = CORRECTION_FACTOR;
+			g_xBandCorrFactor[bBand].Vz = 1031;
+			g_xBandCorrFactor[bBand].Vr = 1058;
+			g_xBandCorrFactor[bBand].Va = 1047;
 
 			g_bGainDDS[bBand] = g_bDefGainDdsIdx[bBand];
 		}
