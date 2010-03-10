@@ -201,9 +201,15 @@ void main()
 
 				if (bMode != MODE_VFO)	// Does not measure in VFO mode
 				{
-					Delay_Ms(400);
+										// Wait 500ms to estabilize
+										// If pressed key continues
+					g_bMeasureCounter = 4;	
+					do
+					{
+						M8C_Sleep;
+						bKey = KEYPAD_Scan();
+					} while (g_bMeasureCounter!=0);	
 					Do_Measure();
-					DDS_Set(0);
 											// Do the basic calcs
 					gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 					gwZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
@@ -234,7 +240,6 @@ void main()
 							DDS_Set(dwCurrentFreq+DIZZLING_FREQ);
 							Delay_Ms(100);
 							Do_Measure();
-							DDS_Set(0);
 
 							wSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 							wZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
@@ -276,6 +281,9 @@ void main()
 					default:
 						break;
 				}
+				if (bMode != MODE_VFO)	// Does not turn-off DDS in VFO mode
+					DDS_Set(0);
+
 			}
 										// Waits for key or time for new measurement
 			g_bMeasureCounter = MEASURE_PERIOD;

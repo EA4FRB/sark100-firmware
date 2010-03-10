@@ -59,7 +59,7 @@
 extern BYTE KEYPAD_Get ( void );
 extern BYTE KEYPAD_WaitKey ( BYTE bDelayS );
 extern void KEYPAD_SysSuspend ( void );
-
+extern BYTE KEYPAD_Scan ( void );
 
 //-----------------------------------------------------------------------------
 #endif
