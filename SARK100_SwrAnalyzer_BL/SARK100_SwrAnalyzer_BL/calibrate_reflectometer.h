@@ -45,6 +45,7 @@
 //  Prototypes
 //-----------------------------------------------------------------------------
 extern void Calibrate_Reflectometer (void);
+extern void Do_Correct (void);
 extern void Adjust_Dds_Gain (BYTE bBand);
 
 //-----------------------------------------------------------------------------

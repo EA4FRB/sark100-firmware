@@ -84,7 +84,6 @@ void Do_Measure ( void )
 		g_xBridgeMeasure.Vf = 0;
 	else
 		g_xBridgeMeasure.Vf -= g_xBridgeOffset.Vf;
-	g_xBridgeMeasure.Vf *= g_xBridgeCorrect.Vf;
 
 										// Read Va
 	AMUX4_ADC_InputSelect(AMUX4_ADC_PORT0_7);
@@ -93,7 +92,6 @@ void Do_Measure ( void )
 		g_xBridgeMeasure.Va = 0;
 	else
 		g_xBridgeMeasure.Va -= g_xBridgeOffset.Va;
-	g_xBridgeMeasure.Va *= g_xBridgeCorrect.Va;
 
 										// Read Vz
 	AMUX4_ADC_InputSelect(AMUX4_ADC_PORT0_5);
@@ -102,7 +100,6 @@ void Do_Measure ( void )
 		g_xBridgeMeasure.Vz = 0;
 	else
 		g_xBridgeMeasure.Vz -= g_xBridgeOffset.Vz;
-	g_xBridgeMeasure.Vz *= g_xBridgeCorrect.Vz;
 
 										// Read Vr
 										// Gain is set to double because dynamic range is half
@@ -114,7 +111,6 @@ void Do_Measure ( void )
 		g_xBridgeMeasure.Vr = 0;
 	else
 		g_xBridgeMeasure.Vr -= g_xBridgeOffset.Vr;
-	g_xBridgeMeasure.Vr *= g_xBridgeCorrect.Vr;
 
 	ADCINC12_Stop();
 	PGA_ADC_Stop();

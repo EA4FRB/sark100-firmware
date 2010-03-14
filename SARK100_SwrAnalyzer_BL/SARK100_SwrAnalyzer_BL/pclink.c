@@ -315,6 +315,8 @@ static void Cmd_Imp (void)
 	BYTE szMsg[20];
 
 	Do_Measure();
+	Do_Correct();
+
 	gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 	gwZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 	gwR = Calculate_R(gwZ, gwSwr);
@@ -360,6 +362,7 @@ static void Cmd_Raw (void)
 	BYTE szMsg[20];
 
 	Do_Measure();
+	Do_Correct();
 
 	ltoa(szMsg, g_xBridgeMeasure.Vf, 10);
 	UART_PutString(szMsg);

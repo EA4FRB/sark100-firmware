@@ -54,8 +54,8 @@ volatile BYTE g_bSpeedKeyCounter = 0;
 BYTE g_bIsCalibrated;					// TRUE if calibrated
 BYTE g_bGainDDS[BAND_MAX];				// DDS PGA's settings for each band
 										// Correction values for each band
-BRIDGE_VOLTAGES g_xBandCorrFactor[BAND_MAX];
-BRIDGE_VOLTAGES g_xBridgeCorrect;		// Current correction values
+BRIDGE_CORRECT g_xBandCorrFactor[BAND_MAX];
+BRIDGE_CORRECT g_xBridgeCorrect;		// Current correction values
 BRIDGE_VOLTAGES g_xBridgeOffset;		// Measurement offset
 BRIDGE_VOLTAGES g_xBridgeMeasure;		// Measured values
 DWORD g_dwSaveFreqBand[BAND_MAX];		// Stores frequency val when switching bands
@@ -106,21 +106,22 @@ GAIN_DDS const g_xGainDds[GAIN_SETTINGS_MAX] =
 	{PGA_DDS_1_G0_50,PGA_DDS_2_G0_06},	//0.5x0.06=0.03
 };
 
-										// Default PGA DDS gain index table
-const g_bDefGainDdsIdx[BAND_MAX] =
+										// Default band settings
+const BRIDGE_CORRECT_DEFAULTS g_xDefBandSettings[BAND_MAX] =
 {
-	2,	//BAND_160M
-	2,	//BAND_80M
-	2,	//BAND_40M
-	3,	//BAND_30M
-	3, 	//BAND_25M
-	3,	//BAND_20M
-	4,	//BAND_17M
-	4,	//BAND_15M
-	5,	//BAND_12M
-	6,	//BAND_11M
-	6,	//BAND_10M
-	8,	//BAND_8M
-	10	//BAND_6M
+	// Gain, VR.Slope, VR.Offset, VZ.Slope, VZ.Offset, VA.Slope, VA.Offset,
+	{ 2,  {{-3362, 1137}, {-2055, 1060}, {-9256, 1184}} },	//BAND_160M
+	{ 2,  {{-3841, 1149}, {-1980, 1060}, {-9436, 1187}} },	//BAND_80M
+	{ 2,  {{-3889, 1150}, {-2087, 1063}, {-8615, 1176}} },	//BAND_40M
+	{ 3,  {{-3304, 1139}, {-1943, 1061}, {-7067, 1156}} },	//BAND_30M
+	{ 3,  {{-3478, 1143}, {-1790, 1058}, {-6769, 1151}} },	//BAND_25M
+	{ 3,  {{-3535, 1144}, {-1649, 1056}, {-5799, 1138}} },	//BAND_20M
+	{ 4,  {{-3558, 1147}, {-1256, 1048}, {-2941, 1099}} },	//BAND_17M
+	{ 4,  {{-3517, 1146}, {-1562, 1056}, {-483,  1068}} },	//BAND_15M
+	{ 5,  {{-3303, 1142}, {-1202, 1048}, {2471,  1027}} },	//BAND_12M
+	{ 6,  {{-3052, 1139}, {-802,  1040}, {3503,  1009}} },	//BAND_11M
+	{ 6,  {{-3094, 1137}, {-906,  1042}, {6085,  973 }} },	//BAND_10M
+	{ 8,  {{-2736, 1126}, {277,   1019}, {16909, 821 }} },	//BAND_8M
+	{ 10, {{-1783, 1092}, {1171,  998 }, {30861, 607 }} }	//BAND_6M
 };
 

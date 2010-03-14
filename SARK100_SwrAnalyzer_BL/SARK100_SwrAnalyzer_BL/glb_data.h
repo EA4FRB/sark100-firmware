@@ -143,6 +143,25 @@ typedef struct							// Configuration data stored in EEPROM
 	BYTE bUserIddle;
 } CONFIG_DATA;
 
+typedef struct							// Two point calibration data
+{
+	INT iSlope;
+	INT iOffset;
+} CORRECT_DATA;
+
+typedef struct							// Complete correction data
+{
+	CORRECT_DATA xVr;
+	CORRECT_DATA xVz;
+	CORRECT_DATA xVa;
+} BRIDGE_CORRECT;
+
+typedef struct
+{
+	BYTE bGain;
+	BRIDGE_CORRECT xBridgeCorrect;
+} BRIDGE_CORRECT_DEFAULTS;
+
 //-----------------------------------------------------------------------------
 //  Public data:
 //-----------------------------------------------------------------------------
@@ -153,15 +172,15 @@ extern volatile BYTE g_bSpeedKeyCounter;
 
 extern BYTE g_bIsCalibrated;
 extern BYTE g_bGainDDS[BAND_MAX];
-extern BRIDGE_VOLTAGES g_xBandCorrFactor[BAND_MAX];
-extern BRIDGE_VOLTAGES g_xBridgeCorrect;
+extern BRIDGE_CORRECT g_xBandCorrFactor[BAND_MAX];
+extern BRIDGE_CORRECT g_xBridgeCorrect;
 extern BRIDGE_VOLTAGES g_xBridgeOffset;
 extern BRIDGE_VOLTAGES g_xBridgeMeasure;
 extern CONFIG_DATA g_xConf;
 extern BAND_LIMITS const g_xBandLimits[BAND_MAX];
 extern DWORD g_dwSaveFreqBand[BAND_MAX];
 extern GAIN_DDS const g_xGainDds[GAIN_SETTINGS_MAX];
-extern const g_bDefGainDdsIdx[BAND_MAX];
+extern const BRIDGE_CORRECT_DEFAULTS g_xDefBandSettings[BAND_MAX];
 
 extern WORD gwSwr;
 extern WORD gwZ;

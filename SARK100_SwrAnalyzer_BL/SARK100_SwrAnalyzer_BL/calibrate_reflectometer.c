@@ -55,11 +55,38 @@
 //#define DEBUG	1						// Uncomment to debug calibration results on USB
 
 //-----------------------------------------------------------------------------
+//  Typedefs
+//-----------------------------------------------------------------------------
+typedef struct							// Two-point calibration vector
+{
+	WORD wX0;
+	WORD wX1;
+	WORD wY0;
+	WORD wY1;
+} CALIB_VECTOR;
+
+//-----------------------------------------------------------------------------
 //  Defines
 //-----------------------------------------------------------------------------
+#define SLOPE_CORRECT		100000
 #define VF_REFERENCE_LEVEL	4000		// Full scale value
 #define SWR_274_LOAD		548			// Expected SWR at 274-ohm load
-#define MAX_ITER_SWR		100			// Maximum number of iterations looking for best SWR
+#define SWR_150_LOAD		300			// Expected SWR at 150-ohm load
+#define WAIT_TIME_MEASURE	800			// Estabilizing time for measurement (ms)
+
+//-----------------------------------------------------------------------------
+//  Prototypes
+//-----------------------------------------------------------------------------
+static void Calc_Correct (CORRECT_DATA *pxCorr, CALIB_VECTOR *pxVect);
+static WORD Correct_Measure(CORRECT_DATA *pxCorr, WORD wX);
+static BOOL WaitLoadUser (const char *pszText);
+
+//-----------------------------------------------------------------------------
+//  Private data
+//-----------------------------------------------------------------------------
+static CALIB_VECTOR xCalVz[BAND_MAX];
+static CALIB_VECTOR xCalVr[BAND_MAX];
+static CALIB_VECTOR xCalVa[BAND_MAX];
 
 //-----------------------------------------------------------------------------
 //  FUNCTION NAME:	Calibrate_Reflectometer()
@@ -78,11 +105,6 @@
 void Calibrate_Reflectometer (void)
 {
 	BYTE bBand;
-										// Set default correction factors
-	g_xBridgeCorrect.Vf = CORRECTION_FACTOR;
-	g_xBridgeCorrect.Vz = 1;
-	g_xBridgeCorrect.Vr = 1;
-	g_xBridgeCorrect.Va = 1;
 
 	do
 	{
@@ -90,25 +112,11 @@ void Calibrate_Reflectometer (void)
 
 		DDS_Set(0);
 		Delay_Ms(200);
+
 										// No signal, no load
 										// Get offset readings
-		LCD_Position(0, 0);
-		LCD_PrCString(gConfigCalibStr);
-		LCD_Position(1, 0);
-		LCD_PrCString(gOpenLoadStr);
-		BUZZ_Beep();
-		if ( KEYPAD_WaitKey(TIME_WAIT_KEY_S) == KBD_UP )
+		if (!WaitLoadUser(gOpenLoadStr))
 			break;
-		DISP_Clear();
-		LCD_Position(0, 0);
-		LCD_PrCString(gConfigCalibStr);
-		LCD_Position(1, 0);
-		LCD_PrCString(gInProgressStr);
-
-		g_xBridgeCorrect.Vz = 1;
-		g_xBridgeCorrect.Vr = 1;
-		g_xBridgeCorrect.Va = 1;
-		g_xBridgeCorrect.Vf = 1;
 
 		g_xBridgeOffset.Vz = 0;			// Do_Measure does offset adjustment so set default to 0
 		g_xBridgeOffset.Vr = 0;
@@ -119,7 +127,7 @@ void Calibrate_Reflectometer (void)
 		g_xBridgeOffset = g_xBridgeMeasure;
 
 		DDS_Set(10000000);
-		Delay_Ms(500);
+		Delay_Ms(WAIT_TIME_MEASURE);
 										//
 										// Adjust Vf
 		for (bBand=BAND_MAX-1; bBand>=0;bBand--)
@@ -145,102 +153,69 @@ void Calibrate_Reflectometer (void)
 				break;
 			}
 		}
-#if 1
+
 										//
 										// 50ohm load
-		LCD_Position(0, 0);
-		LCD_PrCString(gConfigCalibStr);
-		LCD_Position(1, 0);
-		LCD_PrCString(g50OhmLoadStr);
-		BUZZ_Beep();
-		if ( KEYPAD_WaitKey(TIME_WAIT_KEY_S) == KBD_UP )
+		if (!WaitLoadUser(g50OhmLoadStr))
 			break;
-		DISP_Clear();
-		LCD_Position(0, 0);
-		LCD_PrCString(gConfigCalibStr);
-		LCD_Position(1, 0);
-		LCD_PrCString(gInProgressStr);
-
 										// At each band frequency, ...
-        								// Determine correction factor for Vz and Vr to be 1/2 Vf (using 50-ohm load)
+        								// Determine correction factor for Vz and Va to be 1/2 Vf (using 50-ohm load)
 		for (bBand=0; bBand<BAND_MAX;bBand++)
 		{
 			Adjust_Dds_Gain(bBand);
 			DDS_Set(g_xBandLimits[bBand].middle * BAND_FREQ_MULT);
-			Delay_Ms(400);
-
+			Delay_Ms(WAIT_TIME_MEASURE);
 			Do_Measure();
 
-			g_xBandCorrFactor[bBand].Vz = (g_xBridgeMeasure.Vf*CORRECTION_FACTOR)/(2*g_xBridgeMeasure.Vz);
-			g_xBandCorrFactor[bBand].Va = (g_xBridgeMeasure.Vf*CORRECTION_FACTOR)/(2*g_xBridgeMeasure.Va);
+			xCalVz[bBand].wX0 = g_xBridgeMeasure.Vz;
+			xCalVz[bBand].wY0 = (DWORD)((DWORD)g_xBridgeMeasure.Vf*CORRECTION_FACTOR)/(DWORD)(2*g_xBridgeMeasure.Vz);
+			xCalVa[bBand].wX0 = g_xBridgeMeasure.Va;
+			xCalVa[bBand].wY0 = (DWORD)((DWORD)g_xBridgeMeasure.Vf*CORRECTION_FACTOR)/(DWORD)(2*g_xBridgeMeasure.Va);
         }
-#endif
-#if 0
 										//
 										// 150ohm load
-		LCD_Position(0, 0);
-		LCD_PrCString(gConfigCalibStr);
-		LCD_Position(1, 0);
-		LCD_PrCString(g150OhmLoadStr);
-		BUZZ_Beep();
-		if ( KEYPAD_WaitKey(TIME_WAIT_KEY_S) == KBD_UP )
+		if (!WaitLoadUser(g150OhmLoadStr))
 			break;
-		DISP_Clear();
-		LCD_Position(0, 0);
-		LCD_PrCString(gConfigCalibStr);
-		LCD_Position(1, 0);
-		LCD_PrCString(gInProgressStr);
 										// At each band frequency, ...
         								// Determine correction factor for Vz to be 3/4 Vf and Va to be 1/4 Vf (using 150-ohm load)
+										// Determine correction factor for Vr --> SWR:300
 		for (bBand=0; bBand<BAND_MAX;bBand++)
 		{
 			Adjust_Dds_Gain(bBand);
 			DDS_Set(g_xBandLimits[bBand].middle * BAND_FREQ_MULT);
-			Delay_Ms(400);
-
+			Delay_Ms(WAIT_TIME_MEASURE);
 			Do_Measure();
 
-			g_xBandCorrFactor[bBand].Vz = (g_xBridgeMeasure.Vf*CORRECTION_FACTOR*3)/(4*g_xBridgeMeasure.Vz);
-			g_xBandCorrFactor[bBand].Va = (g_xBridgeMeasure.Vf*CORRECTION_FACTOR)/(4*g_xBridgeMeasure.Va);
+			xCalVz[bBand].wX1 = g_xBridgeMeasure.Vz;
+			xCalVz[bBand].wY1 = (DWORD)((DWORD)g_xBridgeMeasure.Vf*CORRECTION_FACTOR*3)/(DWORD)(4*g_xBridgeMeasure.Vz);
+			xCalVa[bBand].wX1 = g_xBridgeMeasure.Va;
+			xCalVa[bBand].wY1 = (DWORD)((DWORD)g_xBridgeMeasure.Vf*CORRECTION_FACTOR)/(DWORD)(4*g_xBridgeMeasure.Va);
+			
+			xCalVr[bBand].wX0 = g_xBridgeMeasure.Vr;
+			xCalVr[bBand].wY0 = ((DWORD)(((SWR_150_LOAD-100)*g_xBridgeMeasure.Vf)/(SWR_150_LOAD+100))*CORRECTION_FACTOR)/(DWORD)g_xBridgeMeasure.Vr;
         }
-#endif
-										// 274ohm load
-		LCD_Position(0, 0);
-		LCD_PrCString(gConfigCalibStr);
-		LCD_Position(1, 0);
-		LCD_PrCString(g274OhmLoadStr);
-		BUZZ_Beep();
-		if ( KEYPAD_WaitKey(TIME_WAIT_KEY_S) == KBD_UP )
-			break;
-		DISP_Clear();
-		LCD_Position(0, 0);
-		LCD_PrCString(gConfigCalibStr);
-		LCD_Position(1, 0);
-		LCD_PrCString(gInProgressStr);
 
+										// 274ohm load
+		if (!WaitLoadUser(g274OhmLoadStr))
+			break;
 										// At each band frequency, ...
-        								// Determine correction factor for SWR to be 548 (using 274-ohm load)
+        								// Determine correction factor for Vr to get a SWR of 548 (using 274-ohm load)
 		for (bBand=0; bBand<BAND_MAX;bBand++)
 		{
 			BYTE ii;
 
-			g_xBandCorrFactor[bBand].Vr = CORRECTION_FACTOR;
-			g_xBridgeCorrect = g_xBandCorrFactor[bBand];
 			Adjust_Dds_Gain(bBand);
 			DDS_Set(g_xBandLimits[bBand].middle * BAND_FREQ_MULT);
-			Delay_Ms(400);
-			for (ii=0;ii<MAX_ITER_SWR;ii++)
-			{
-				Do_Measure();
-				gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
-				if (gwSwr == SWR_274_LOAD)
-					break;
-				else if (gwSwr>SWR_274_LOAD)
-					g_xBridgeCorrect.Vr--;
-				else
-					g_xBridgeCorrect.Vr++;
-			}
-			g_xBandCorrFactor[bBand] = g_xBridgeCorrect;
+			Delay_Ms(WAIT_TIME_MEASURE);
+			Do_Measure();
+
+			xCalVr[bBand].wX1 = g_xBridgeMeasure.Vr;
+			xCalVr[bBand].wY1 = ((DWORD)(((SWR_274_LOAD-100)*g_xBridgeMeasure.Vf)/(SWR_274_LOAD+100))*CORRECTION_FACTOR)/(DWORD)g_xBridgeMeasure.Vr;
+
+										// Convert calibration factor to slope and offset		
+			Calc_Correct(&g_xBandCorrFactor[bBand].xVz, &xCalVz[bBand]);
+			Calc_Correct(&g_xBandCorrFactor[bBand].xVa, &xCalVa[bBand]);
+			Calc_Correct(&g_xBandCorrFactor[bBand].xVr, &xCalVr[bBand]);
         }
 
 										// Store data
@@ -267,7 +242,7 @@ void Calibrate_Reflectometer (void)
 	UART_Start(UART_PARITY_NONE); 		// Enable UART
 	M8C_EnableGInt ;
 	UART_PutChar(12); 					// Clear the screen
-
+/*
 										// Print offset
 	UART_CPutString("Offset, VF=");
 	ltoa(szMsg, g_xBridgeOffset.Vf, 10);
@@ -282,7 +257,7 @@ void Calibrate_Reflectometer (void)
 	ltoa(szMsg, g_xBridgeOffset.Vz, 10);
 	UART_PutString(szMsg);
 	UART_PutCRLF();
-
+*/
 										// Print correction factors
 	for (bBand=0; bBand<BAND_MAX;bBand++)
 	{
@@ -290,20 +265,32 @@ void Calibrate_Reflectometer (void)
 		itoa(szMsg, bBand, 10);
 		UART_PutString(szMsg);
 
-		UART_CPutString(", Gain=");
+		UART_CPutString(", G=");
 		itoa(szMsg, g_bGainDDS[bBand], 10);
 		UART_PutString(szMsg);
 
-		UART_CPutString(", CorrVR=");
-		ltoa(szMsg, g_xBandCorrFactor[bBand].Vr, 10);
+		UART_CPutString(", VR.S=");
+		ltoa(szMsg, g_xBandCorrFactor[bBand].xVr.iSlope, 10);
 		UART_PutString(szMsg);
 
-		UART_CPutString(", CorrVZ=");
-		ltoa(szMsg, g_xBandCorrFactor[bBand].Vz, 10);
+		UART_CPutString(", VR.O=");
+		ltoa(szMsg, g_xBandCorrFactor[bBand].xVr.iOffset, 10);
 		UART_PutString(szMsg);
 
-		UART_CPutString(", CorrVA=");
-		ltoa(szMsg, g_xBandCorrFactor[bBand].Va, 10);
+		UART_CPutString(", VZ.S=");
+		ltoa(szMsg, g_xBandCorrFactor[bBand].xVz.iSlope, 10);
+		UART_PutString(szMsg);
+
+		UART_CPutString(", VZ.O=");
+		ltoa(szMsg, g_xBandCorrFactor[bBand].xVz.iOffset, 10);
+		UART_PutString(szMsg);
+
+		UART_CPutString(", VA.S=");
+		ltoa(szMsg, g_xBandCorrFactor[bBand].xVa.iSlope, 10);
+		UART_PutString(szMsg);
+
+		UART_CPutString(", VA.O=");
+		ltoa(szMsg, g_xBandCorrFactor[bBand].xVa.iOffset, 10);
 		UART_PutString(szMsg);
 
 		UART_PutCRLF();
@@ -311,6 +298,28 @@ void Calibrate_Reflectometer (void)
 	UART_Stop();
 }
 #endif
+}
+
+//-----------------------------------------------------------------------------
+//  FUNCTION NAME:	Do_Correct()
+//
+//  DESCRIPTION:
+//
+//	Do the complete adjustment of the measurement based on two-point calibration data
+//
+//  ARGUMENTS:
+//  	none
+//
+//  RETURNS:
+//     none.
+//
+//-----------------------------------------------------------------------------
+void Do_Correct (void)
+{
+	g_xBridgeMeasure.Vf *= CORRECTION_FACTOR;
+	g_xBridgeMeasure.Vz *= Correct_Measure(&g_xBridgeCorrect.xVz, g_xBridgeMeasure.Vz);
+	g_xBridgeMeasure.Va *= Correct_Measure(&g_xBridgeCorrect.xVa, g_xBridgeMeasure.Va);
+	g_xBridgeMeasure.Vr *= Correct_Measure(&g_xBridgeCorrect.xVr, g_xBridgeMeasure.Vr);
 }
 
 //-----------------------------------------------------------------------------
@@ -333,4 +342,78 @@ void Adjust_Dds_Gain (BYTE bBand)
 	PGA_DDS_2_SetGain(g_xGainDds[g_bGainDDS[bBand]].bGain2);
 }
 
+//-----------------------------------------------------------------------------
+//  FUNCTION NAME:	Correct_Measure()
+//
+//  DESCRIPTION:
+//
+//	Corrects measurement: y=mx+b
+//
+//  ARGUMENTS:
+//  	pxCorr	Correction data (slope and offset)
+//		wX		Data to correct
+//
+//  RETURNS:
+//     none.
+//
+//-----------------------------------------------------------------------------
+static WORD Correct_Measure(CORRECT_DATA *pxCorr, WORD wX)
+{
+	return (((LONG)pxCorr->iSlope*(LONG)wX)/SLOPE_CORRECT)+pxCorr->iOffset;
+}
 
+//-----------------------------------------------------------------------------
+//  FUNCTION NAME:	Calc_Correct()
+//
+//  DESCRIPTION:
+//
+//	Converts two-point calibration vector to slope and offset
+//
+//  ARGUMENTS:
+//  	pxCorr	Correction data (slope and offset)
+//		pxVect	Calibration vector
+//
+//  RETURNS:
+//     none.
+//
+//-----------------------------------------------------------------------------
+static void Calc_Correct (CORRECT_DATA *pxCorr, CALIB_VECTOR *pxVect)
+{
+	LONG lTmp;
+	lTmp = (LONG)pxVect->wY1-(LONG)pxVect->wY0;
+	lTmp *= (LONG)SLOPE_CORRECT;
+	pxCorr->iSlope = lTmp/((LONG)pxVect->wX1-(LONG)pxVect->wX0);
+	pxCorr->iOffset = (LONG)pxVect->wY1-((LONG)((LONG)pxCorr->iSlope*pxVect->wX1)/(LONG)SLOPE_CORRECT);
+}
+
+//-----------------------------------------------------------------------------
+//  FUNCTION NAME:	WaitLoadUser()
+//
+//  DESCRIPTION:
+//
+//	Wait for load and user action
+//
+//  ARGUMENTS:
+//  	pszText	Text in display
+//
+//  RETURNS:
+//     FALSE user abort
+//
+//-----------------------------------------------------------------------------
+static BOOL WaitLoadUser (const char *pszText)
+{
+	LCD_Position(0, 0);
+	LCD_PrCString(gConfigCalibStr);
+	LCD_Position(1, 0);
+	LCD_PrCString(pszText);
+	BUZZ_Beep();
+	if ( KEYPAD_WaitKey(TIME_WAIT_KEY_S) == KBD_UP )
+		return FALSE;
+	DISP_Clear();
+	LCD_Position(0, 0);
+	LCD_PrCString(gConfigCalibStr);
+	LCD_Position(1, 0);
+	LCD_PrCString(gInProgressStr);
+	
+	return TRUE;
+}

@@ -210,6 +210,7 @@ void main()
 						bKey = KEYPAD_Scan();
 					} while (g_bMeasureCounter!=0);	
 					Do_Measure();
+					Do_Correct();
 											// Do the basic calcs
 					gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 					gwZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
@@ -240,6 +241,7 @@ void main()
 							DDS_Set(dwCurrentFreq+DIZZLING_FREQ);
 							Delay_Ms(100);
 							Do_Measure();
+							Do_Correct();
 
 							wSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 							wZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
@@ -486,7 +488,7 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 		LCD_Position(ROW_FREQ, COL_FREQ);
 		DISP_Frequency(dwCurrentFreq);
 
-		Do_Measure();
+		Do_Measure();					// Do not correct for faster speed
 		gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 #if 0
 		gwZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);

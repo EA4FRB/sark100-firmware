@@ -60,7 +60,7 @@
 typedef struct							// Structure stored in EEPROM
 {
 										// Calibration data
-	BRIDGE_VOLTAGES xBandCorrFactor[BAND_MAX];
+	BRIDGE_CORRECT xBandCorrFactor[BAND_MAX];
 	BYTE bGainDDS[BAND_MAX];
 	BRIDGE_VOLTAGES xBridgeOffset;
 	BYTE bIsCalibrated;
@@ -138,12 +138,8 @@ void STR_Restore ( void )
 										// Set defaults
 		for (bBand=0;bBand<BAND_MAX;bBand++)
 		{
-			g_xBandCorrFactor[bBand].Vf = CORRECTION_FACTOR;
-			g_xBandCorrFactor[bBand].Vz = 1031;
-			g_xBandCorrFactor[bBand].Vr = 1058;
-			g_xBandCorrFactor[bBand].Va = 1047;
-
-			g_bGainDDS[bBand] = g_bDefGainDdsIdx[bBand];
+			g_xBandCorrFactor[bBand] = g_xDefBandSettings[bBand].xBridgeCorrect;
+			g_bGainDDS[bBand] =	g_xDefBandSettings[bBand].bGain;
 		}
 		g_xBridgeOffset.Vf = 0;
 		g_xBridgeOffset.Vr = 0;
