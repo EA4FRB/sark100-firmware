@@ -68,11 +68,11 @@ typedef struct							// Two-point calibration vector
 //-----------------------------------------------------------------------------
 //  Defines
 //-----------------------------------------------------------------------------
-#define SLOPE_CORRECT		100000
+#define SLOPE_CORRECT		10000
 #define VF_REFERENCE_LEVEL	4000		// Full scale value
 #define SWR_274_LOAD		548			// Expected SWR at 274-ohm load
 #define SWR_150_LOAD		300			// Expected SWR at 150-ohm load
-#define WAIT_TIME_MEASURE	800			// Estabilizing time for measurement (ms)
+#define WAIT_TIME_MEASURE	1000		// Estabilizing time for measurement (ms)
 
 //-----------------------------------------------------------------------------
 //  Prototypes

@@ -70,8 +70,8 @@ static DWORD TakeSample (void);
 //-----------------------------------------------------------------------------
 void Do_Measure ( void )
 {
-	ADCINC12_Start(ADCINC12_HIGHPOWER); // Turn on Analog section
-	PGA_ADC_Start(PGA_ADC_HIGHPOWER);
+//	ADCINC12_Start(ADCINC12_HIGHPOWER); // Turn on Analog section
+//	PGA_ADC_Start(PGA_ADC_HIGHPOWER);
 
 	PGA_ADC_SetGain(PGA_ADC_G2_67);
 	WaitPgaSettling();
@@ -112,8 +112,8 @@ void Do_Measure ( void )
 	else
 		g_xBridgeMeasure.Vr -= g_xBridgeOffset.Vr;
 
-	ADCINC12_Stop();
-	PGA_ADC_Stop();
+//	ADCINC12_Stop();
+//	PGA_ADC_Stop();
 }
 
 //-----------------------------------------------------------------------------

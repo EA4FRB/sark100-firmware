@@ -162,11 +162,12 @@ void main()
 	PGA_DDS_2_Start(PGA_DDS_2_HIGHPOWER);
 	Adjust_Dds_Gain(bBand);
 
+	ADCINC12_Start(ADCINC12_HIGHPOWER); // Turn on Analog section
+	PGA_ADC_Start(PGA_ADC_HIGHPOWER);
 										// Check Vf level
 	DDS_Set(dwCurrentFreq);
 	Delay_Ms(100);
 	Do_Measure();
-	DDS_Set(0);
 
 	if (g_xBridgeMeasure.Vf<500)		// Vf too low, warn user
 	{
@@ -196,19 +197,8 @@ void main()
 										// If frequency is scrolled fast it does not measure
 			if ((bMode != MODE_OFF)&&!((bKey==KBD_2xUP)||(bKey==KBD_2xDWN)))
 			{
-										// Set frequency, measure, and deactivate
-				DDS_Set(dwCurrentFreq);
-
 				if (bMode != MODE_VFO)	// Does not measure in VFO mode
 				{
-										// Wait 500ms to estabilize
-										// If pressed key continues
-					g_bMeasureCounter = 4;	
-					do
-					{
-						M8C_Sleep;
-						bKey = KEYPAD_Scan();
-					} while (g_bMeasureCounter!=0);	
 					Do_Measure();
 					Do_Correct();
 											// Do the basic calcs
@@ -242,6 +232,7 @@ void main()
 							Delay_Ms(100);
 							Do_Measure();
 							Do_Correct();
+							DDS_Set(dwCurrentFreq);
 
 							wSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 							wZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
@@ -283,9 +274,6 @@ void main()
 					default:
 						break;
 				}
-				if (bMode != MODE_VFO)	// Does not turn-off DDS in VFO mode
-					DDS_Set(0);
-
 			}
 										// Waits for key or time for new measurement
 			g_bMeasureCounter = MEASURE_PERIOD;
@@ -297,12 +285,14 @@ void main()
 				{
 					case KBD_CONFIG:
 										// Enter configuration mode routine
+						DDS_Set(0);		// Disables DDS to save power
 						Mode_Config();
 
 										// Get band-specific correction factors based on current freq dial setting
 						g_xBridgeCorrect = g_xBandCorrFactor[bBand];
 										// Adjust DDS gain setting
 						Adjust_Dds_Gain(bBand);
+						DDS_Set(dwCurrentFreq);
 						break;
 
 					case KBD_MODE:
@@ -311,16 +301,22 @@ void main()
 							PGA_DDS_1_Start(PGA_DDS_1_HIGHPOWER);
 							PGA_DDS_2_Start(PGA_DDS_2_HIGHPOWER);
 							Adjust_Dds_Gain(bBand);
+							ADCINC12_Start(ADCINC12_HIGHPOWER); // Turn on Analog section
+							PGA_ADC_Start(PGA_ADC_HIGHPOWER);
 
 										// Enables DDS oscillator and backlight (shared port)
+							DDS_Set(dwCurrentFreq);
 							//XO_EN_Data_ADDR |= XO_EN_MASK;
 						}
 						if (++bMode >= MODE_MAX)
 							bMode = MODE_SWR;
 						if (bMode==MODE_OFF)
 						{				// Enter OFF mode
+							DDS_Set(0);
 							PGA_DDS_1_Stop();
 							PGA_DDS_2_Stop();
+							ADCINC12_Stop();
+							PGA_ADC_Stop();
 
 										// Disables DDS oscillator and backlight (shared port)
 							//XO_EN_Data_ADDR &= ~XO_EN_MASK;
@@ -338,7 +334,7 @@ void main()
 										// Get band-specific correction factors based on current freq dial setting
 						g_xBridgeCorrect = g_xBandCorrFactor[bBand];
 						Adjust_Dds_Gain(bBand);
-
+						DDS_Set(dwCurrentFreq);
 									// Displays band
 						DISP_Clear();
 						LCD_Position(0, 0);
@@ -355,6 +351,7 @@ void main()
 						{
 							dwCurrentFreq = dwScanFreq;
 						}
+						DDS_Set(dwCurrentFreq);
 						break;
 
 					case KBD_2xUP:
@@ -370,6 +367,7 @@ void main()
 							g_xBridgeCorrect = g_xBandCorrFactor[bBand];
 							Adjust_Dds_Gain(bBand);
 							dwCurrentFreq = g_xBandLimits[bBand].low * BAND_FREQ_MULT;
+							DDS_Set(dwCurrentFreq);
 
 							DISP_Clear();
 							LCD_Position(0, 0);
@@ -394,7 +392,8 @@ void main()
 							g_xBridgeCorrect = g_xBandCorrFactor[bBand];
 							Adjust_Dds_Gain(bBand);
 							dwCurrentFreq = g_xBandLimits[bBand].high * BAND_FREQ_MULT;
-
+							DDS_Set(dwCurrentFreq);
+			
 							DISP_Clear();
 							LCD_Position(0, 0);
 							LCD_PrCString(gBandLitStr);
@@ -425,6 +424,9 @@ void main()
 				PGA_DDS_1_Stop();
 				PGA_DDS_2_Stop();
 
+				ADCINC12_Stop();
+				PGA_ADC_Stop();
+
 				LCD_Init();
 				LCD_Control(LCD_OFF);	// Display off
 
@@ -435,13 +437,20 @@ void main()
 				XO_EN_Data_ADDR |= XO_EN_MASK;
 				Port_2_Data_SHADE |= XO_EN_MASK;
 
-				PGA_DDS_1_Start(PGA_DDS_1_HIGHPOWER);
-				PGA_DDS_2_Start(PGA_DDS_2_HIGHPOWER);
-				Adjust_Dds_Gain(bBand);
-
 				DDS_Init();
 
 				g_bIddleCounter = GetUserIddle(g_xConf.bUserIddle);
+				
+				if (bMode != MODE_OFF)
+				{
+					DDS_Set(dwCurrentFreq);
+					PGA_DDS_1_Start(PGA_DDS_1_HIGHPOWER);
+					PGA_DDS_2_Start(PGA_DDS_2_HIGHPOWER);
+					Adjust_Dds_Gain(bBand);
+
+					ADCINC12_Start(ADCINC12_HIGHPOWER); // Turn on Analog section
+					PGA_ADC_Start(PGA_ADC_HIGHPOWER);
+				}
 				bKey = 1;				// Forces exit loop
 			}
 		} while (bKey==0);

@@ -58,7 +58,7 @@
 
 #define TIME_WAIT_KEY_S		30			// Time to wait for key when dialog, units of seconds
 
-#define	MEASURE_PERIOD		16			// Measurements sample period, units 1/8 sec
+#define	MEASURE_PERIOD		4			// Measurements sample period, units 1/8 sec
 
 #define BAND_FREQ_MULT		(100000)	// Frequency multiplier for frequency tables
 
