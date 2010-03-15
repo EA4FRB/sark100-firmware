@@ -197,8 +197,8 @@ void main()
 										// If frequency is scrolled fast it does not measure
 			if ((bMode != MODE_OFF)&&!((bKey==KBD_2xUP)||(bKey==KBD_2xDWN)))
 			{
-				if (bMode != MODE_VFO)	// Does not measure in VFO mode
-				{
+//				if (bMode != MODE_VFO)	// Does not measure in VFO mode
+//				{
 					Do_Measure();
 					Do_Correct();
 											// Do the basic calcs
@@ -206,7 +206,7 @@ void main()
 					gwZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 					gwR = Calculate_R(gwZ, gwSwr);
 					gwX = Calculate_X(gwZ, gwR);
-				}
+//				}
 										// Display data depending mode
 				switch (bMode)
 				{
@@ -270,7 +270,7 @@ void main()
 						DISP_Inductance(gwL);
 						break;
 
-					case MODE_VFO:		// Does nothing
+//					case MODE_VFO:		// Does nothing
 					default:
 						break;
 				}
@@ -367,7 +367,6 @@ void main()
 							g_xBridgeCorrect = g_xBandCorrFactor[bBand];
 							Adjust_Dds_Gain(bBand);
 							dwCurrentFreq = g_xBandLimits[bBand].low * BAND_FREQ_MULT;
-							DDS_Set(dwCurrentFreq);
 
 							DISP_Clear();
 							LCD_Position(0, 0);
@@ -376,6 +375,7 @@ void main()
 							LCD_PrCString(gBandStr[bBand]);
 							KEYPAD_WaitKey(TIME_DELAY_TEXT);
 						}
+						DDS_Set(dwCurrentFreq);
 						break;
 
 					case KBD_2xDWN:
@@ -392,7 +392,6 @@ void main()
 							g_xBridgeCorrect = g_xBandCorrFactor[bBand];
 							Adjust_Dds_Gain(bBand);
 							dwCurrentFreq = g_xBandLimits[bBand].high * BAND_FREQ_MULT;
-							DDS_Set(dwCurrentFreq);
 			
 							DISP_Clear();
 							LCD_Position(0, 0);
@@ -401,6 +400,7 @@ void main()
 							LCD_PrCString(gBandStr[bBand]);
 							KEYPAD_WaitKey(TIME_DELAY_TEXT);
 						}
+						DDS_Set(dwCurrentFreq);
 						break;
 
 					default:
@@ -498,19 +498,14 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 		DISP_Frequency(dwCurrentFreq);
 
 		Do_Measure();					// Do not correct for faster speed
+		Do_Correct();
+
 		gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
-#if 0
-		gwZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
-#endif
 		LCD_Position(ROW_SWR, 0);
 		LCD_PrCString(gBlankStr);
 
 		LCD_Position(ROW_SWR, COL_SWR);
 		DISP_Swr(gwSwr);
-#if 0
-		LCD_Position(ROW_IMP, COL_IMP);
-		DISP_Impedance(gwZ);
-#endif
 										// Code to detect 2.0 SWR limits
 		if (gwSwr <= wSwrMin)
 		{

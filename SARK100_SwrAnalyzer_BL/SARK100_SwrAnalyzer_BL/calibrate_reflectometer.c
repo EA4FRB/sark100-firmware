@@ -141,8 +141,10 @@ void Calibrate_Reflectometer (void)
 				PGA_DDS_2_SetGain(g_xGainDds[bGainIdx].bGain2);
 				Delay_Ms(200);
 				Do_Measure();
-				if (g_xBridgeMeasure.Vf >= (VF_REFERENCE_LEVEL-g_xBridgeOffset.Vf))
+				if (g_xBridgeMeasure.Vf > (VF_REFERENCE_LEVEL-g_xBridgeOffset.Vf))
 				{
+					if (bGainIdx < (GAIN_SETTINGS_MAX-1))
+						bGainIdx++;
 					g_bGainDDS[bBand] = bGainIdx;
 					break;
 				}
@@ -265,31 +267,31 @@ void Calibrate_Reflectometer (void)
 		itoa(szMsg, bBand, 10);
 		UART_PutString(szMsg);
 
-		UART_CPutString(", G=");
+		UART_CPutString("\t G=");
 		itoa(szMsg, g_bGainDDS[bBand], 10);
 		UART_PutString(szMsg);
 
-		UART_CPutString(", VR.S=");
+		UART_CPutString("\t VR.S=");
 		ltoa(szMsg, g_xBandCorrFactor[bBand].xVr.iSlope, 10);
 		UART_PutString(szMsg);
 
-		UART_CPutString(", VR.O=");
+		UART_CPutString("\t VR.O=");
 		ltoa(szMsg, g_xBandCorrFactor[bBand].xVr.iOffset, 10);
 		UART_PutString(szMsg);
 
-		UART_CPutString(", VZ.S=");
+		UART_CPutString("\t VZ.S=");
 		ltoa(szMsg, g_xBandCorrFactor[bBand].xVz.iSlope, 10);
 		UART_PutString(szMsg);
 
-		UART_CPutString(", VZ.O=");
+		UART_CPutString("\t VZ.O=");
 		ltoa(szMsg, g_xBandCorrFactor[bBand].xVz.iOffset, 10);
 		UART_PutString(szMsg);
 
-		UART_CPutString(", VA.S=");
+		UART_CPutString("\t VA.S=");
 		ltoa(szMsg, g_xBandCorrFactor[bBand].xVa.iSlope, 10);
 		UART_PutString(szMsg);
 
-		UART_CPutString(", VA.O=");
+		UART_CPutString("\t VA.O=");
 		ltoa(szMsg, g_xBandCorrFactor[bBand].xVa.iOffset, 10);
 		UART_PutString(szMsg);
 

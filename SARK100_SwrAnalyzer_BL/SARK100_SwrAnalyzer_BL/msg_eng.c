@@ -67,13 +67,13 @@ BYTE const gModeImpStr	[] = "IMP";
 BYTE const gModeCapStr	[] = "CAP";
 BYTE const gModeIndStr	[] = "IND";
 BYTE const gModeOffStr	[] = "OFF";
-BYTE const gModeVfoStr	[] = "VFO";
+//BYTE const gModeVfoStr	[] = "VFO";
 BYTE const *gModeStr[] = {
 							gModeSwrStr,
 							gModeImpStr,
 							gModeCapStr,
 							gModeIndStr,
-							gModeVfoStr,
+//							gModeVfoStr,
 							gModeOffStr
 							};
 

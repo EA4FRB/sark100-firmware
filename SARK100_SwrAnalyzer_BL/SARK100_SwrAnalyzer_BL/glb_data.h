@@ -81,7 +81,7 @@ typedef enum {							// Mode menu
 	MODE_IMP,
 	MODE_CAP,
 	MODE_IND,
-	MODE_VFO,
+//	MODE_VFO,
 	MODE_OFF,
 
 	MODE_MAX
