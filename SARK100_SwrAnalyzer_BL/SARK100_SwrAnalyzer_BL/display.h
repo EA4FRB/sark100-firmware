@@ -54,7 +54,7 @@
 void DISP_Setup ( void );
 void DISP_Frequency ( DWORD dwFreq );
 void DISP_Swr ( WORD wSwr );
-void DISP_ImpedanceComplex ( WORD wR, WORD wX, BYTE bIsPositive );
+void DISP_ImpedanceComplex ( WORD wR, WORD wX, BYTE bSign );
 void DISP_Impedance ( WORD wZ );
 void DISP_Capacitance ( WORD wC );
 void DISP_Inductance ( WORD wL );

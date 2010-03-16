@@ -140,22 +140,20 @@ void DISP_Swr ( WORD wSwr )
 //  ARGUMENTS:
 //		wR			Resistance
 //		wX			Reactance
-//		bIsPostive	TRUE if reactance is positive (indcutive)
+//		bSign		Sign of impedance
 //
 //  RETURNS:
 //    none.
 //
 //-----------------------------------------------------------------------------
-void DISP_ImpedanceComplex ( WORD wR, WORD wX, BYTE bIsPositive )
+void DISP_ImpedanceComplex ( WORD wR, WORD wX, BYTE bSign )
 {
 	char szText[16];
 
 	itoa(szText, wR, 10);
 	LCD_PrString(szText);
-	if (bIsPositive)
-		LCD_PrCString("+j");
-	else
-	LCD_PrCString("-j");
+	LCD_Write_Data( bSign );
+	LCD_Write_Data( 'j' );
 	itoa(szText, wX, 10);
 	LCD_PrString(szText);
 }

@@ -319,9 +319,12 @@ void Calibrate_Reflectometer (void)
 void Do_Correct (void)
 {
 	g_xBridgeMeasure.Vf *= CORRECTION_FACTOR;
-	g_xBridgeMeasure.Vz *= Correct_Measure(&g_xBridgeCorrect.xVz, g_xBridgeMeasure.Vz);
-	g_xBridgeMeasure.Va *= Correct_Measure(&g_xBridgeCorrect.xVa, g_xBridgeMeasure.Va);
 	g_xBridgeMeasure.Vr *= Correct_Measure(&g_xBridgeCorrect.xVr, g_xBridgeMeasure.Vr);
+	if (g_bScanning == FALSE)
+	{
+		g_xBridgeMeasure.Vz *= Correct_Measure(&g_xBridgeCorrect.xVz, g_xBridgeMeasure.Vz);
+		g_xBridgeMeasure.Va *= Correct_Measure(&g_xBridgeCorrect.xVa, g_xBridgeMeasure.Va);
+	}	
 }
 
 //-----------------------------------------------------------------------------

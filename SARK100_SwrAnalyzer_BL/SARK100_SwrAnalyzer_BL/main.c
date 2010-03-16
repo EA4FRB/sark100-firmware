@@ -107,7 +107,11 @@ void main()
 	BYTE bKey = 0;
 	BYTE ii;
 	BYTE bUserIddle;
+	BYTE bDizzling;
+	BYTE bSign;
+	WORD wDizzlingX;
 
+	g_bScanning = FALSE;
 	M8C_ClearWDTAndSleep;				// Put sleep and watchdog timers into a known state
 										// before enabling interrupts.
 										// Enables sleep timer
@@ -115,6 +119,9 @@ void main()
 	M8C_EnableGInt;						// Enable global interrupt
 
 	DISP_Setup();						// Enables display
+										// Enables backlight
+	Port_2_Data_SHADE |= XO_EN_MASK;
+	XO_EN_Data_ADDR |= XO_EN_MASK;
 
 	// Display welcome screen
 	LCD_Position(0, 0);
@@ -139,9 +146,7 @@ void main()
 		DISP_Clear();
 	}
 
-										// Enables DDS oscillator and backlight (shared port)
-	Port_2_Data_SHADE |= XO_EN_MASK;
-	XO_EN_Data_ADDR |= XO_EN_MASK;
+										// Enables DDS oscillator 
 	Delay_Ms(10);						// Lets some time to stabilize oscillator
 	DDS_Init();
 
@@ -164,6 +169,7 @@ void main()
 
 	ADCINC12_Start(ADCINC12_HIGHPOWER); // Turn on Analog section
 	PGA_ADC_Start(PGA_ADC_HIGHPOWER);
+	PGA_ADC_SetGain(PGA_ADC_G2_67);
 										// Check Vf level
 	DDS_Set(dwCurrentFreq);
 	Delay_Ms(100);
@@ -186,6 +192,11 @@ void main()
 	g_bIddleCounter = GetUserIddle(g_xConf.bUserIddle);
 	do
 	{
+										// Initializes dizzling variables
+		BYTE bDizzling = FALSE;
+		BYTE bSign = ' ';
+		WORD wDizzlingX = 0;
+
 										// Display mode and frequency
 		DISP_Clear();
 		LCD_Position(ROW_MODE, COL_MODE);
@@ -197,16 +208,14 @@ void main()
 										// If frequency is scrolled fast it does not measure
 			if ((bMode != MODE_OFF)&&!((bKey==KBD_2xUP)||(bKey==KBD_2xDWN)))
 			{
-//				if (bMode != MODE_VFO)	// Does not measure in VFO mode
-//				{
-					Do_Measure();
-					Do_Correct();
-											// Do the basic calcs
-					gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
-					gwZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
-					gwR = Calculate_R(gwZ, gwSwr);
-					gwX = Calculate_X(gwZ, gwR);
-//				}
+				Do_Measure();
+				Do_Correct();
+										// Do the basic calcs
+				gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
+				gwZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
+				gwR = Calculate_R(gwZ, gwSwr);
+				gwX = Calculate_X(gwZ, gwR);
+
 										// Display data depending mode
 				switch (bMode)
 				{
@@ -220,37 +229,31 @@ void main()
 						break;
 
 					case MODE_IMP:
-
-						{				// Dizzling
-							WORD wSwr;
-							WORD wZ;
-							WORD wX;
-							WORD wR;
-							BYTE bSign;
-										//Set frequency, measure, and deactivate
+						if (bDizzling == FALSE)
+						{
+							wDizzlingX = gwX;
+							bDizzling = TRUE;
 							DDS_Set(dwCurrentFreq+DIZZLING_FREQ);
-							Delay_Ms(100);
-							Do_Measure();
-							Do_Correct();
-							DDS_Set(dwCurrentFreq);
-
-							wSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
-							wZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
-							wR = Calculate_R(wZ, wSwr);
-							wX = Calculate_X(wZ, wR);
-         								//Increasing X with increasing F ==> inductive reactance = +j
-         								//Decreasing X with increasing F ==> capacitive reactance = -j
-							if (wX >= gwX)
-								bSign = TRUE;
-							else
-								bSign = FALSE;
-
 							LCD_Position(ROW_SWR, 0);
 							LCD_PrCString(gBlankStr);
 							LCD_Position(ROW_SWR, COL_SWR);
 							DISP_Swr(gwSwr);
 							LCD_Position(ROW_IMP, COL_IMP);
 							DISP_ImpedanceComplex(gwR, gwX, bSign);
+						}
+						else
+						{
+							bDizzling = FALSE;
+							DDS_Set(dwCurrentFreq);
+         								//Increasing X with increasing F ==> inductive reactance = +j
+         								//Decreasing X with increasing F ==> capacitive reactance = -j
+										//If value <20 consider undeterminate to avoid bouncing
+							if (abs((INT)wDizzlingX-gwX)<20)
+								bSign = ' ';
+							else if (wDizzlingX>gwX)
+								bSign = '+';
+							else
+								bSign = '-';
 						}
 						break;
 
@@ -270,7 +273,6 @@ void main()
 						DISP_Inductance(gwL);
 						break;
 
-//					case MODE_VFO:		// Does nothing
 					default:
 						break;
 				}
@@ -345,6 +347,7 @@ void main()
 						break;
 
 					case KBD_SCAN:
+						g_bScanning = TRUE;
 										// Enter scan mode
 						dwScanFreq = Mode_Scan(bBand, g_xConf.bStep);
 						if (dwScanFreq!=-1)
@@ -352,6 +355,7 @@ void main()
 							dwCurrentFreq = dwScanFreq;
 						}
 						DDS_Set(dwCurrentFreq);
+						g_bScanning = FALSE;
 						break;
 
 					case KBD_2xUP:

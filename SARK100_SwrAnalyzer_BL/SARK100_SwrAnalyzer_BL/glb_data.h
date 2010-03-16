@@ -58,7 +58,7 @@
 
 #define TIME_WAIT_KEY_S		30			// Time to wait for key when dialog, units of seconds
 
-#define	MEASURE_PERIOD		4			// Measurements sample period, units 1/8 sec
+#define	MEASURE_PERIOD		8			// Measurements sample period, units 1/8 sec
 
 #define BAND_FREQ_MULT		(100000)	// Frequency multiplier for frequency tables
 
@@ -170,6 +170,7 @@ extern volatile BYTE g_bMeasureCounter;
 extern volatile BYTE g_bDebounceCounter;
 extern volatile BYTE g_bSpeedKeyCounter;
 
+extern BYTE g_bScanning;
 extern BYTE g_bIsCalibrated;
 extern BYTE g_bGainDDS[BAND_MAX];
 extern BRIDGE_CORRECT g_xBandCorrFactor[BAND_MAX];

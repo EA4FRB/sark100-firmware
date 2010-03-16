@@ -50,7 +50,6 @@
 //-----------------------------------------------------------------------------
 //  Prototypes
 //-----------------------------------------------------------------------------
-static void WaitPgaSettling (void);
 static DWORD TakeSample (void);
 
 //-----------------------------------------------------------------------------
@@ -70,12 +69,6 @@ static DWORD TakeSample (void);
 //-----------------------------------------------------------------------------
 void Do_Measure ( void )
 {
-//	ADCINC12_Start(ADCINC12_HIGHPOWER); // Turn on Analog section
-//	PGA_ADC_Start(PGA_ADC_HIGHPOWER);
-
-	PGA_ADC_SetGain(PGA_ADC_G2_67);
-	WaitPgaSettling();
-
 										// Read Vf
 	AMUX4_ADC_InputSelect(AMUX4_ADC_PORT0_1);
 
@@ -104,7 +97,7 @@ void Do_Measure ( void )
 										// Read Vr
 										// Gain is set to double because dynamic range is half
 	PGA_ADC_SetGain(PGA_ADC_G5_33);
-	WaitPgaSettling();
+	Delay_Ms(1);
 	AMUX4_ADC_InputSelect(AMUX4_ADC_PORT0_3);
 	g_xBridgeMeasure.Vr = TakeSample();
 	if (g_xBridgeOffset.Vr > g_xBridgeMeasure.Vr)
@@ -112,33 +105,9 @@ void Do_Measure ( void )
 	else
 		g_xBridgeMeasure.Vr -= g_xBridgeOffset.Vr;
 
-//	ADCINC12_Stop();
-//	PGA_ADC_Stop();
+	PGA_ADC_SetGain(PGA_ADC_G2_67);		// Restores gain
 }
 
-//-----------------------------------------------------------------------------
-//  FUNCTION NAME:	WaitPgaSettling
-//
-//  DESCRIPTION:
-//
-//	Waits settling time needed for PGA
-//
-//  ARGUMENTS:
-//     none.
-//
-//  RETURNS:
-//     none.
-//
-//-----------------------------------------------------------------------------
-static void WaitPgaSettling (void)
-{
-	Delay_Ms(1);
-/*
-	volatile int ii;
-	for (ii=0;ii<20;ii++)
-	{;}
-*/
-}
 //-----------------------------------------------------------------------------
 //  FUNCTION NAME:	TakeSample
 //

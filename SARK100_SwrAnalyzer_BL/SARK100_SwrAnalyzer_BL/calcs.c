@@ -209,7 +209,7 @@ WORD Calculate_L (WORD wX, DWORD dwFreq)
 
 	dwFreq /= 1000;						// Hz to Khz
 
-	dwTemp = ((DWORD)wX*100000)/628;
+	dwTemp = ((DWORD)wX*100000)/63;
 	return dwTemp / dwFreq;
 }
 
@@ -233,10 +233,10 @@ WORD Calculate_L (WORD wX, DWORD dwFreq)
 WORD Calculate_C (WORD wX, DWORD dwFreq)
 {
 
-	dwFreq /= 1000;		//Hz to Khz
-
 	if (wX==0)
-		wX=1;
+		return 0;
+
+	dwFreq /= 1000;		//Hz to Khz
 	return ((DWORD)10000/63) * 	((DWORD)10000/dwFreq) * ((DWORD)10000/(wX*10));
 }
 
