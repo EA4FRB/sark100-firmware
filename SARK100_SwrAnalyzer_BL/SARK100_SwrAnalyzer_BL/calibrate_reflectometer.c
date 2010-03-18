@@ -72,7 +72,7 @@ typedef struct							// Two-point calibration vector
 #define VF_REFERENCE_LEVEL	4000		// Full scale value
 #define SWR_274_LOAD		548			// Expected SWR at 274-ohm load
 #define SWR_150_LOAD		300			// Expected SWR at 150-ohm load
-#define WAIT_TIME_MEASURE	1000		// Estabilizing time for measurement (ms)
+#define WAIT_TIME_MEASURE	500			// Estabilizing time for measurement (ms)
 
 //-----------------------------------------------------------------------------
 //  Prototypes
@@ -111,7 +111,7 @@ void Calibrate_Reflectometer (void)
 		DISP_Clear();
 
 		DDS_Set(0);
-		Delay_Ms(200);
+		Delay_Ms(WAIT_TIME_MEASURE);
 
 										// No signal, no load
 										// Get offset readings
@@ -139,7 +139,7 @@ void Calibrate_Reflectometer (void)
 			{
 				PGA_DDS_1_SetGain(g_xGainDds[bGainIdx].bGain1);
 				PGA_DDS_2_SetGain(g_xGainDds[bGainIdx].bGain2);
-				Delay_Ms(200);
+				Delay_Ms(100);
 				Do_Measure();
 				if (g_xBridgeMeasure.Vf > (VF_REFERENCE_LEVEL-g_xBridgeOffset.Vf))
 				{
