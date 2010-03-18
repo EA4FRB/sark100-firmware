@@ -53,6 +53,8 @@
 #include "calibrate_reflectometer.h"
 #include "pclink.h"
 
+//#define DEBUG	1
+
 //-----------------------------------------------------------------------------
 //  Defines
 //-----------------------------------------------------------------------------
@@ -110,6 +112,9 @@ void main()
 	BYTE bDizzling;
 	BYTE bSign;
 	WORD wDizzlingX;
+#ifdef DEBUG
+	BYTE szMsg[20];
+#endif
 
 	g_bScanning = FALSE;
 	M8C_ClearWDTAndSleep;				// Put sleep and watchdog timers into a known state
@@ -188,6 +193,13 @@ void main()
 		DISP_Clear();
 	}
 
+#ifdef DEBUG
+	UART_CmdReset(); 					// Initialize receiver/cmd buffer
+	UART_IntCntl(UART_ENABLE_RX_INT); 	// Enable RX interrupts
+	UART_Start(UART_PARITY_NONE); 		// Enable UART
+	M8C_EnableGInt ;
+	UART_PutChar(12); 					// Clear the screen
+#endif
 										// Resets iddle counter
 	g_bIddleCounter = GetUserIddle(g_xConf.bUserIddle);
 	do
@@ -209,12 +221,58 @@ void main()
 			if ((bMode != MODE_OFF)&&!((bKey==KBD_2xUP)||(bKey==KBD_2xDWN)))
 			{
 				Do_Measure();
+#ifdef DEBUG				
+				UART_CPutString("[Raw] Vf=");
+				ltoa(szMsg, g_xBridgeMeasure.Vf, 10);
+				UART_PutString(szMsg);
+				UART_CPutString("\tVr=");
+				ltoa(szMsg, g_xBridgeMeasure.Vr, 10);
+				UART_PutString(szMsg);
+				UART_CPutString("\tVz=");
+				ltoa(szMsg, g_xBridgeMeasure.Vz, 10);
+				UART_PutString(szMsg);
+				UART_CPutString("\tVa=");
+				ltoa(szMsg, g_xBridgeMeasure.Va, 10);
+				UART_PutString(szMsg);
+				UART_PutCRLF();
+#endif				
 				Do_Correct();
+#ifdef DEBUG				
+				UART_CPutString("[Corr] Vf=");
+				ltoa(szMsg, g_xBridgeMeasure.Vf, 10);
+				UART_PutString(szMsg);
+				UART_CPutString("\tVr=");
+				ltoa(szMsg, g_xBridgeMeasure.Vr, 10);
+				UART_PutString(szMsg);
+				UART_CPutString("\tVz=");
+				ltoa(szMsg, g_xBridgeMeasure.Vz, 10);
+				UART_PutString(szMsg);
+				UART_CPutString("\tVa=");
+				ltoa(szMsg, g_xBridgeMeasure.Va, 10);
+				UART_PutString(szMsg);
+				UART_PutCRLF();
+#endif				
 										// Do the basic calcs
 				gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 				gwZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 				gwR = Calculate_R(gwZ, gwSwr);
 				gwX = Calculate_X(gwZ, gwR);
+#ifdef DEBUG				
+				UART_CPutString("[Meas] Swr=");
+				itoa(szMsg, gwSwr, 10);
+				UART_PutString(szMsg);
+				UART_CPutString("\tZ=");
+				itoa(szMsg, gwZ, 10);
+				UART_PutString(szMsg);
+				UART_CPutString("\tR=");
+				itoa(szMsg, gwR, 10);
+				UART_PutString(szMsg);
+				UART_CPutString("\tX=");
+				itoa(szMsg, gwX, 10);
+				UART_PutString(szMsg);
+				UART_PutCRLF();
+				UART_PutCRLF();
+#endif				
 
 										// Display data depending mode
 				switch (bMode)
@@ -501,7 +559,7 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 		LCD_Position(ROW_FREQ, COL_FREQ);
 		DISP_Frequency(dwCurrentFreq);
 
-		Do_Measure();					// Do not correct for faster speed
+		Do_Measure();					
 		Do_Correct();
 
 		gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
@@ -690,5 +748,7 @@ static void Mode_Config (void)
 		}
 	} while (TRUE);
 }
+
+
 
 
