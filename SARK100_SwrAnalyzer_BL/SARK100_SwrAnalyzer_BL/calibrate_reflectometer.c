@@ -130,11 +130,12 @@ void Calibrate_Reflectometer (void)
 		Delay_Ms(WAIT_TIME_MEASURE);
 										//
 										// Adjust Vf
-		for (bBand=BAND_MAX-1; bBand>=0;bBand--)
+		for (bBand=0; bBand<BAND_MAX;bBand++)
 		{
 			BYTE bGainIdx;
 
 			DDS_Set(g_xBandLimits[bBand].middle * BAND_FREQ_MULT);
+			Delay_Ms(WAIT_TIME_MEASURE);
 			for (bGainIdx=0;bGainIdx<GAIN_SETTINGS_MAX;bGainIdx++)
 			{
 				PGA_DDS_1_SetGain(g_xGainDds[bGainIdx].bGain1);
@@ -152,7 +153,6 @@ void Calibrate_Reflectometer (void)
 			if (bGainIdx==GAIN_SETTINGS_MAX)
 			{
 				g_bGainDDS[bBand] = GAIN_SETTINGS_MAX-1;
-				break;
 			}
 		}
 

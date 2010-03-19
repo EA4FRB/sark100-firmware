@@ -62,7 +62,7 @@
 
 #define BAND_FREQ_MULT		(100000)	// Frequency multiplier for frequency tables
 
-#define GAIN_SETTINGS_MAX	14			// Number of gain settings for DDS PGAs
+#define GAIN_SETTINGS_MAX	17			// Number of gain settings for DDS PGAs
 
 #define SWR_MAX				999			// Maximum supported SWR value
 
