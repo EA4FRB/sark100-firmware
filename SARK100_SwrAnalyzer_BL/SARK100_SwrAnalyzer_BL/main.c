@@ -150,10 +150,8 @@ void main()
 		KEYPAD_WaitKey(TIME_DELAY_TEXT);
 		DISP_Clear();
 	}
-
-										// Enables DDS oscillator 
-	Delay_Ms(10);						// Lets some time to stabilize oscillator
-	DDS_Init();
+										
+	DDS_Init();							// Enables DDS oscillator 
 
 										// Setup default frequency
 	dwCurrentFreq = g_xBandLimits[bBand].middle * BAND_FREQ_MULT;

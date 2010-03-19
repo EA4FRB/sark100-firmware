@@ -406,6 +406,7 @@ static void Cmd_Scan (BYTE bRaw)
 	BYTE bBandEnd;
 	char * strPtr; 						// Parameter pointer
 
+	g_bScanning = TRUE;
 	do
 	{
 										// Get start frequency
@@ -469,5 +470,7 @@ static void Cmd_Scan (BYTE bRaw)
 			DDS_Set(0);
 		}
 	} while (FALSE);
+	
+	g_bScanning = FALSE;
 }
 

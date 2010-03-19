@@ -125,7 +125,8 @@ void Do_Measure ( void )
 static DWORD TakeSample (void)
 {
 	WORD wVal = 0;
-	WORD wZero = 0;
+	WORD wZero;
+	BYTE ii;
 										// Correlated double sampling
 	PGA_ADC_GAIN_CR1 &= ~1;				// Set input to RefLO
 	ADCINC12_GetSamples(1);
@@ -135,12 +136,28 @@ static DWORD TakeSample (void)
 	ADCINC12_ClearFlag();
 
 	PGA_ADC_GAIN_CR1 |= 1;				// Set input to PortInp
-	ADCINC12_GetSamples(1);
-										// Wait for data to be ready.
-	while(ADCINC12_fIsDataAvailable() == 0);
-	wVal = (ADCINC12_iGetData()+2048);
-	ADCINC12_ClearFlag();
 
+	if (g_bScanning == FALSE)			// If not scanning do some averaging
+	{
+		for (ii=0;ii<4;ii++)
+		{
+			ADCINC12_GetSamples(1);
+										// Wait for data to be ready.
+			while(ADCINC12_fIsDataAvailable() == 0);
+			wVal += (ADCINC12_iGetData()+2048);
+			ADCINC12_ClearFlag();
+		}
+		wVal /= 4;
+	}
+	else
+	{
+		ADCINC12_GetSamples(1);
+										// Wait for data to be ready.
+		while(ADCINC12_fIsDataAvailable() == 0);
+		wVal = (ADCINC12_iGetData()+2048);
+		ADCINC12_ClearFlag();
+	}	
+	
 	if (wVal >= wZero)
 		return wVal-wZero;
 	else
