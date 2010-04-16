@@ -45,8 +45,10 @@
 //  Defines
 //-----------------------------------------------------------------------------
 #define LCD_CLEAR			1
-#define LCD_OFF				0x80
-#define LCD_ON				0xc0
+#define LCD_OFF				0x08
+#define LCD_ON				0x0c
+#define LCD_ON_CURSOR		0x0e
+#define LCD_ON_BLINK		0x0d
 
 //-----------------------------------------------------------------------------
 //  Public functions

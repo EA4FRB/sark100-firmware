@@ -52,6 +52,7 @@
 #define KBD_DWN		6
 #define KBD_2xUP	7
 #define KBD_2xDWN	8
+#define KBD_UP_DWN	9
 
 //-----------------------------------------------------------------------------
 //  Prototypes

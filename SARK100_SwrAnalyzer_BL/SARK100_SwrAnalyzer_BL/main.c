@@ -87,6 +87,27 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep);
 static void Mode_Config (void);
 
 //-----------------------------------------------------------------------------
+//  Private data
+//-----------------------------------------------------------------------------
+#define MAX_INCREMENT		7
+
+typedef struct
+{
+	BYTE bCol;
+	DWORD dwIncrement;
+} INCREMENT_CONTROL;
+
+INCREMENT_CONTROL const gxIncrementControl[MAX_INCREMENT] =
+{
+	{COL_FREQ+9, 1},
+	{COL_FREQ+8, 10},
+	{COL_FREQ+7, 100},
+	{COL_FREQ+5, 1000},
+	{COL_FREQ+4, 10000},
+	{COL_FREQ+3, 100000},
+	{COL_FREQ+1, 1000000},
+};
+//-----------------------------------------------------------------------------
 //  FUNCTION NAME:	main
 //
 //  DESCRIPTION:
@@ -112,6 +133,8 @@ void main()
 	BYTE bDizzling;
 	BYTE bSign;
 	WORD wDizzlingX;
+	BYTE bFrChMode = FALSE;
+	BYTE bIncCtl = 4;					// Cursor position index. Default set to 10Khz
 #ifdef DEBUG
 	BYTE szMsg[20];
 #endif
@@ -150,8 +173,8 @@ void main()
 		KEYPAD_WaitKey(TIME_DELAY_TEXT);
 		DISP_Clear();
 	}
-										
-	DDS_Init();							// Enables DDS oscillator 
+
+	DDS_Init();							// Enables DDS oscillator
 
 										// Setup default frequency
 	dwCurrentFreq = g_xBandLimits[bBand].middle * BAND_FREQ_MULT;
@@ -208,18 +231,21 @@ void main()
 		WORD wDizzlingX = 0;
 
 										// Display mode and frequency
+		LCD_Control(LCD_ON);
 		DISP_Clear();
 		LCD_Position(ROW_MODE, COL_MODE);
 		LCD_PrCString(gModeStr[bMode]);
 		LCD_Position(ROW_FREQ, COL_FREQ);
 		DISP_Frequency(dwCurrentFreq);
+										// Set cursor position
+		LCD_Position(ROW_FREQ, gxIncrementControl[bIncCtl].bCol);
 		do
 		{
 										// If frequency is scrolled fast it does not measure
 			if ((bMode != MODE_OFF)&&!((bKey==KBD_2xUP)||(bKey==KBD_2xDWN)))
 			{
 				Do_Measure();
-#ifdef DEBUG				
+#ifdef DEBUG
 				UART_CPutString("[Raw] Vf=");
 				ltoa(szMsg, g_xBridgeMeasure.Vf, 10);
 				UART_PutString(szMsg);
@@ -233,9 +259,9 @@ void main()
 				ltoa(szMsg, g_xBridgeMeasure.Va, 10);
 				UART_PutString(szMsg);
 				UART_PutCRLF();
-#endif				
+#endif
 				Do_Correct();
-#ifdef DEBUG				
+#ifdef DEBUG
 				UART_CPutString("[Corr] Vf=");
 				ltoa(szMsg, g_xBridgeMeasure.Vf, 10);
 				UART_PutString(szMsg);
@@ -249,13 +275,13 @@ void main()
 				ltoa(szMsg, g_xBridgeMeasure.Va, 10);
 				UART_PutString(szMsg);
 				UART_PutCRLF();
-#endif				
+#endif
 										// Do the basic calcs
 				gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 				gwZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 				gwR = Calculate_R(gwZ, gwSwr);
 				gwX = Calculate_X(gwZ, gwR);
-#ifdef DEBUG				
+#ifdef DEBUG
 				UART_CPutString("[Meas] Swr=");
 				itoa(szMsg, gwSwr, 10);
 				UART_PutString(szMsg);
@@ -270,7 +296,7 @@ void main()
 				UART_PutString(szMsg);
 				UART_PutCRLF();
 				UART_PutCRLF();
-#endif				
+#endif
 
 										// Display data depending mode
 				switch (bMode)
@@ -333,15 +359,26 @@ void main()
 						break;
 				}
 			}
+										// Set cursor position
+			LCD_Position(ROW_FREQ, gxIncrementControl[bIncCtl].bCol);
+			if (bFrChMode==TRUE)
+				LCD_Control(LCD_ON_BLINK);
+			else
+				LCD_Control(LCD_ON_CURSOR);
 										// Waits for key or time for new measurement
 			g_bMeasureCounter = MEASURE_PERIOD;
 			do
 			{
+				BYTE bNewBand;
+				DWORD dwNewFreq;
+
 				M8C_Sleep;
 				bKey = KEYPAD_Get();
 				switch ( bKey )
 				{
 					case KBD_CONFIG:
+						bFrChMode=FALSE;
+						LCD_Control(LCD_ON);
 										// Enter configuration mode routine
 						DDS_Set(0);		// Disables DDS to save power
 						Mode_Config();
@@ -351,9 +388,11 @@ void main()
 										// Adjust DDS gain setting
 						Adjust_Dds_Gain(bBand);
 						DDS_Set(dwCurrentFreq);
+						LCD_Control(LCD_ON_CURSOR);
 						break;
 
 					case KBD_MODE:
+						bFrChMode=FALSE;
 						if (bMode==MODE_OFF)
 						{				// Resume from OFF mode
 							PGA_DDS_1_Start(PGA_DDS_1_HIGHPOWER);
@@ -365,11 +404,14 @@ void main()
 										// Enables DDS oscillator and backlight (shared port)
 							DDS_Set(dwCurrentFreq);
 							//XO_EN_Data_ADDR |= XO_EN_MASK;
+
+							LCD_Control(LCD_ON_CURSOR);
 						}
 						if (++bMode >= MODE_MAX)
 							bMode = MODE_SWR;
 						if (bMode==MODE_OFF)
 						{				// Enter OFF mode
+							LCD_Control(LCD_ON);
 							DDS_Set(0);
 							PGA_DDS_1_Stop();
 							PGA_DDS_2_Stop();
@@ -382,14 +424,16 @@ void main()
 						break;
 
 					case KBD_BAND:
-										// Saves current freq
+						bFrChMode=FALSE;
+						LCD_Control(LCD_ON);
+
+						// Saves current freq
 						g_dwSaveFreqBand[bBand] = dwCurrentFreq;
 						if (++bBand >= BAND_MAX)
 							bBand = BAND_160M;
-										// Restores frequency
+									// Restores frequency
 						dwCurrentFreq = g_dwSaveFreqBand[bBand];
-
-										// Get band-specific correction factors based on current freq dial setting
+									// Get band-specific correction factors based on current freq dial setting
 						g_xBridgeCorrect = g_xBandCorrFactor[bBand];
 						Adjust_Dds_Gain(bBand);
 						DDS_Set(dwCurrentFreq);
@@ -400,9 +444,13 @@ void main()
 						LCD_Position(0, 12);
 						LCD_PrCString(gBandStr[bBand]);
 						KEYPAD_WaitKey(TIME_DELAY_TEXT);
+						LCD_Control(LCD_ON_CURSOR);
 						break;
 
 					case KBD_SCAN:
+						bFrChMode=FALSE;
+						LCD_Control(LCD_ON);
+
 						g_bScanning = TRUE;
 										// Enter scan mode
 						dwScanFreq = Mode_Scan(bBand, g_xConf.bStep);
@@ -412,53 +460,69 @@ void main()
 						}
 						DDS_Set(dwCurrentFreq);
 						g_bScanning = FALSE;
+						LCD_Control(LCD_ON_CURSOR);
+						break;
+
+					case KBD_UP_DWN:
+										// Toggle between cursor or frequency change modes
+						if (bFrChMode==TRUE)
+							bFrChMode=FALSE;
+						else
+							bFrChMode=TRUE;
 						break;
 
 					case KBD_2xUP:
-						dwCurrentFreq += GetStep(g_xConf.bStep);
 					case KBD_UP:
-										// Increases frequency
-						dwCurrentFreq += GetStep(g_xConf.bStep);
-						if (dwCurrentFreq >= (g_xBandLimits[bBand].high * BAND_FREQ_MULT))
+										// Moves frequency cursor
+						if (bFrChMode==TRUE)
 						{
-										// Frequency above band limit: go to next upper band
-							if (++bBand >= BAND_MAX)
-								bBand = 0;
+							if (++bIncCtl >= MAX_INCREMENT)
+								bIncCtl = 0;
+							break;
+						}
+										// Increases frequency
+						dwNewFreq = dwCurrentFreq+gxIncrementControl[bIncCtl].dwIncrement;
+						bNewBand = GetBand(dwNewFreq);
+						if (bNewBand==-1)
+						{
+							BUZZ_BeepError();
+							break;
+						}
+						dwCurrentFreq = dwNewFreq;
+						if (bBand!=bNewBand)
+						{
+							bBand = bNewBand;
 							g_xBridgeCorrect = g_xBandCorrFactor[bBand];
 							Adjust_Dds_Gain(bBand);
-							dwCurrentFreq = g_xBandLimits[bBand].low * BAND_FREQ_MULT;
-
-							DISP_Clear();
-							LCD_Position(0, 0);
-							LCD_PrCString(gBandLitStr);
-							LCD_Position(0, 12);
-							LCD_PrCString(gBandStr[bBand]);
-							KEYPAD_WaitKey(TIME_DELAY_TEXT);
 						}
 						DDS_Set(dwCurrentFreq);
 						break;
 
 					case KBD_2xDWN:
-						dwCurrentFreq -= GetStep(g_xConf.bStep);
 					case KBD_DWN:
-										// Decreases frequency
-						dwCurrentFreq -= GetStep(g_xConf.bStep);
-						if (dwCurrentFreq <= (g_xBandLimits[bBand].low * BAND_FREQ_MULT))
+										// Moves frequency cursor
+						if (bFrChMode==TRUE)
 						{
-										// Frequency below band limit: go to lower band
-							if (bBand-- == 0)
-								bBand = BAND_MAX-1;
-
+							if (bIncCtl == 0)
+								bIncCtl = MAX_INCREMENT-1;
+							else
+								bIncCtl--;
+							break;
+						}
+										// Decreases frequency
+						dwNewFreq = dwCurrentFreq-gxIncrementControl[bIncCtl].dwIncrement;
+						bNewBand = GetBand(dwNewFreq);
+						if (bNewBand==-1)
+						{
+							BUZZ_BeepError();
+							break;
+						}
+						dwCurrentFreq = dwNewFreq;
+						if (bBand!=bNewBand)
+						{
+							bBand = bNewBand;
 							g_xBridgeCorrect = g_xBandCorrFactor[bBand];
 							Adjust_Dds_Gain(bBand);
-							dwCurrentFreq = g_xBandLimits[bBand].high * BAND_FREQ_MULT;
-			
-							DISP_Clear();
-							LCD_Position(0, 0);
-							LCD_PrCString(gBandLitStr);
-							LCD_Position(0, 12);
-							LCD_PrCString(gBandStr[bBand]);
-							KEYPAD_WaitKey(TIME_DELAY_TEXT);
 						}
 						DDS_Set(dwCurrentFreq);
 						break;
@@ -475,6 +539,7 @@ void main()
 										// Iddle mode
 			if ((g_bIddleCounter==0) && (GetUserIddle(g_xConf.bUserIddle) != 0))
 			{
+				bFrChMode=FALSE;
 										// Suspend
 										// Disables DDS oscillator and backlight (shared port)
 				DDS_Set(0);				// DDS power down
@@ -492,7 +557,8 @@ void main()
 
 				KEYPAD_SysSuspend();
 										// Resumes
-				LCD_Control(LCD_ON);	// Display on
+										// Display on
+				LCD_Control(LCD_ON_CURSOR);
 										// Enables DDS oscillator and backlight (shared port)
 				XO_EN_Data_ADDR |= XO_EN_MASK;
 				Port_2_Data_SHADE |= XO_EN_MASK;
@@ -500,7 +566,7 @@ void main()
 				DDS_Init();
 
 				g_bIddleCounter = GetUserIddle(g_xConf.bUserIddle);
-				
+
 				if (bMode != MODE_OFF)
 				{
 					DDS_Set(dwCurrentFreq);
@@ -557,7 +623,7 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 		LCD_Position(ROW_FREQ, COL_FREQ);
 		DISP_Frequency(dwCurrentFreq);
 
-		Do_Measure();					
+		Do_Measure();
 		Do_Correct();
 
 		gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);

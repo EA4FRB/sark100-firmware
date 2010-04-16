@@ -167,3 +167,34 @@ BYTE GetUserIddle (BYTE bUserIddle)
 			return 90;
 	}
 }
+
+//-----------------------------------------------------------------------------
+//  FUNCTION NAME:	GetBand
+//
+//  DESCRIPTION:
+//
+//	Get band index for a given frequency
+//
+//  ARGUMENTS:
+//     dwFreq		Frequency in Hz
+//
+//  RETURNS:
+//     none.
+//
+//-----------------------------------------------------------------------------
+BYTE GetBand (DWORD dwFreq)
+{
+	BYTE bBand;
+
+	for (bBand=0; bBand<BAND_MAX; bBand++)
+	{
+		if (dwFreq >= (g_xBandLimits[bBand].low*BAND_FREQ_MULT) &&
+			dwFreq < (g_xBandLimits[bBand].high*BAND_FREQ_MULT))
+			break;
+	}
+	if (bBand>=BAND_MAX)
+		return -1;
+
+	return bBand;
+}
+

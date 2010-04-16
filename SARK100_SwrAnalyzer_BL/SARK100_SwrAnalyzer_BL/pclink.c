@@ -78,7 +78,6 @@ static BYTE const gszErrCmdNotFound2[] = "> not found\r\n";
 //-----------------------------------------------------------------------------
 //  Prototypes
 //-----------------------------------------------------------------------------
-static BYTE GetBand (DWORD dwFreq);
 static void Cmd_Off (void);
 static void Cmd_On (void);
 static void Cmd_Freq (void);
@@ -177,36 +176,6 @@ void PcLink (void)
 	}
 	DDS_Set(0);
 	UART_Stop();
-}
-
-//-----------------------------------------------------------------------------
-//  FUNCTION NAME:	GetBand
-//
-//  DESCRIPTION:
-//
-//	Get band index for a given frequency
-//
-//  ARGUMENTS:
-//     dwFreq		Frequency in Hz
-//
-//  RETURNS:
-//     none.
-//
-//-----------------------------------------------------------------------------
-static BYTE GetBand (DWORD dwFreq)
-{
-	BYTE bBand;
-
-	for (bBand=0; bBand<BAND_MAX; bBand++)
-	{
-		if (dwFreq >= (g_xBandLimits[bBand].low*BAND_FREQ_MULT) &&
-			dwFreq < (g_xBandLimits[bBand].high*BAND_FREQ_MULT))
-			break;
-	}
-	if (bBand>=BAND_MAX)
-		return -1;
-
-	return bBand;
 }
 
 //-----------------------------------------------------------------------------
@@ -470,7 +439,7 @@ static void Cmd_Scan (BYTE bRaw)
 			DDS_Set(0);
 		}
 	} while (FALSE);
-	
+
 	g_bScanning = FALSE;
 }
 

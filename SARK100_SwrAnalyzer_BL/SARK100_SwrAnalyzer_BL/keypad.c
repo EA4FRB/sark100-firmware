@@ -205,7 +205,10 @@ BYTE KEYPAD_Scan ( void )
 	}
 	if ( (ROW1_Data_ADDR & ROW1_MASK) == 0 )
 	{
-		bKey = KBD_DWN;
+		if (bKey == KBD_UP)
+			bKey =  KBD_UP_DWN;
+		else
+			bKey = KBD_DWN;
 	}
 	COL2_Data_ADDR |= COL2_MASK;
 
@@ -261,7 +264,7 @@ void KEYPAD_SysSuspend ( void )
 	M8C_Sleep;							// Goes sleep
 
 	INT_VC = 0;							// Erases vector
-	
+
 	PRT1IE	&= ~(0x3);					// Disables row0&row1 interrupt
 
 										// Disables GPIO interrupt
