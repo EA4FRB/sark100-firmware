@@ -89,7 +89,6 @@ typedef struct							// Structure stored in EEPROM
 void STR_SaveCalibration ( void )
 {
 	E2PROM_bE2Write(offsetof(RECORD_DATA,xBandCorrFactor), (unsigned char*) &g_xBandCorrFactor[0], sizeof(g_xBandCorrFactor), 25);
-	E2PROM_bE2Write(offsetof(RECORD_DATA,xBridgeOffset), (unsigned char*)&g_xBridgeOffset, sizeof(g_xBridgeOffset), 25);
 	E2PROM_bE2Write(offsetof(RECORD_DATA,bIsCalibrated), &g_bIsCalibrated, sizeof(g_bIsCalibrated), 25);
 	E2PROM_bE2Write(offsetof(RECORD_DATA,bGainDDS), (unsigned char*) &g_bGainDDS[0], sizeof(g_bGainDDS), 25);
 }
@@ -141,10 +140,6 @@ void STR_Restore ( void )
 			g_xBandCorrFactor[bBand] = g_xDefBandSettings[bBand].xBridgeCorrect;
 			g_bGainDDS[bBand] =	g_xDefBandSettings[bBand].bGain;
 		}
-		g_xBridgeOffset.Vf = 0;
-		g_xBridgeOffset.Vr = 0;
-		g_xBridgeOffset.Vz = 0;
-		g_xBridgeOffset.Va = 0;
 
 		g_bIsCalibrated = FALSE;
 
@@ -160,6 +155,5 @@ void STR_Restore ( void )
 	E2PROM_E2Read(offsetof(RECORD_DATA,xBandCorrFactor), (unsigned char*) &g_xBandCorrFactor[0], sizeof(g_xBandCorrFactor));
 	E2PROM_E2Read(offsetof(RECORD_DATA,bIsCalibrated), &g_bIsCalibrated, sizeof(g_bIsCalibrated));
 	E2PROM_E2Read(offsetof(RECORD_DATA,bGainDDS), (unsigned char*)&g_bGainDDS[0], sizeof(g_bGainDDS));
-	E2PROM_E2Read(offsetof(RECORD_DATA,xBridgeOffset), (unsigned char*)&g_xBridgeOffset, sizeof(g_xBridgeOffset));
 	E2PROM_E2Read(offsetof(RECORD_DATA,xConf), (unsigned char*)&g_xConf, sizeof(g_xConf));
 }

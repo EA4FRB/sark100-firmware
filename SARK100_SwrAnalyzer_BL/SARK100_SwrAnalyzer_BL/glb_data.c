@@ -57,7 +57,6 @@ BYTE g_bGainDDS[BAND_MAX];				// DDS PGA's settings for each band
 										// Correction values for each band
 BRIDGE_CORRECT g_xBandCorrFactor[BAND_MAX];
 BRIDGE_CORRECT g_xBridgeCorrect;		// Current correction values
-BRIDGE_VOLTAGES g_xBridgeOffset;		// Measurement offset
 BRIDGE_VOLTAGES g_xBridgeMeasure;		// Measured values
 DWORD g_dwSaveFreqBand[BAND_MAX];		// Stores frequency val when switching bands
 CONFIG_DATA g_xConf;					// Configuration data

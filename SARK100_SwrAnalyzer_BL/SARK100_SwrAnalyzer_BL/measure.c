@@ -71,28 +71,15 @@ void Do_Measure ( void )
 {
 										// Read Vf
 	AMUX4_ADC_InputSelect(AMUX4_ADC_PORT0_1);
-
 	g_xBridgeMeasure.Vf = TakeSample();
-	if (g_xBridgeOffset.Vf > g_xBridgeMeasure.Vf)
-		g_xBridgeMeasure.Vf = 0;
-	else
-		g_xBridgeMeasure.Vf -= g_xBridgeOffset.Vf;
 
 										// Read Va
 	AMUX4_ADC_InputSelect(AMUX4_ADC_PORT0_7);
 	g_xBridgeMeasure.Va = TakeSample();
-	if (g_xBridgeOffset.Va > g_xBridgeMeasure.Va)
-		g_xBridgeMeasure.Va = 0;
-	else
-		g_xBridgeMeasure.Va -= g_xBridgeOffset.Va;
 
 										// Read Vz
 	AMUX4_ADC_InputSelect(AMUX4_ADC_PORT0_5);
 	g_xBridgeMeasure.Vz = TakeSample();
-	if (g_xBridgeOffset.Vz > g_xBridgeMeasure.Vz)
-		g_xBridgeMeasure.Vz = 0;
-	else
-		g_xBridgeMeasure.Vz -= g_xBridgeOffset.Vz;
 
 										// Read Vr
 										// Gain is set to double because dynamic range is half
@@ -100,10 +87,6 @@ void Do_Measure ( void )
 	Delay_Ms(1);
 	AMUX4_ADC_InputSelect(AMUX4_ADC_PORT0_3);
 	g_xBridgeMeasure.Vr = TakeSample();
-	if (g_xBridgeOffset.Vr > g_xBridgeMeasure.Vr)
-		g_xBridgeMeasure.Vr = 0;
-	else
-		g_xBridgeMeasure.Vr -= g_xBridgeOffset.Vr;
 
 	PGA_ADC_SetGain(PGA_ADC_G2_67);		// Restores gain
 }
@@ -163,3 +146,4 @@ static DWORD TakeSample (void)
 	else
 		return 0;
 }
+

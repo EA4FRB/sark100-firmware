@@ -69,7 +69,7 @@ typedef struct							// Two-point calibration vector
 //  Defines
 //-----------------------------------------------------------------------------
 #define SLOPE_CORRECT		10000
-#define VF_REFERENCE_LEVEL	4000		// Full scale value
+#define VF_REFERENCE_LEVEL	(4095-35)	// Full scale value
 #define SWR_274_LOAD		548			// Expected SWR at 274-ohm load
 #define SWR_150_LOAD		300			// Expected SWR at 150-ohm load
 #define WAIT_TIME_MEASURE	500			// Estabilizing time for measurement (ms)
@@ -105,29 +105,32 @@ static CALIB_VECTOR xCalVa[BAND_MAX];
 void Calibrate_Reflectometer (void)
 {
 	BYTE bBand;
-
+	WORD wZero;
+	
 	do
 	{
 		DISP_Clear();
 
 		DDS_Set(0);
 		Delay_Ms(WAIT_TIME_MEASURE);
-
 										// No signal, no load
 										// Get offset readings
 		if (!WaitLoadUser(gOpenLoadStr))
 			break;
 
-		g_xBridgeOffset.Vz = 0;			// Do_Measure does offset adjustment so set default to 0
-		g_xBridgeOffset.Vr = 0;
-		g_xBridgeOffset.Va = 0;
-		g_xBridgeOffset.Vf = 0;
-
-		Do_Measure();
-		g_xBridgeOffset = g_xBridgeMeasure;
-
 		DDS_Set(10000000);
 		Delay_Ms(WAIT_TIME_MEASURE);
+		
+										// Measures zero level
+		PGA_ADC_GAIN_CR1 &= ~1;			// Set input to RefLO
+		ADCINC12_GetSamples(1);
+										// Wait for data to be ready.
+		while(ADCINC12_fIsDataAvailable() == 0);
+		wZero = (ADCINC12_iGetData()+2048);
+		ADCINC12_ClearFlag();
+	
+		PGA_ADC_GAIN_CR1 |= 1;			// Set input to PortInp
+		
 										//
 										// Adjust Vf
 		for (bBand=0; bBand<BAND_MAX;bBand++)
@@ -142,10 +145,8 @@ void Calibrate_Reflectometer (void)
 				PGA_DDS_2_SetGain(g_xGainDds[bGainIdx].bGain2);
 				Delay_Ms(100);
 				Do_Measure();
-				if (g_xBridgeMeasure.Vf > (VF_REFERENCE_LEVEL-g_xBridgeOffset.Vf))
+				if (g_xBridgeMeasure.Vf >= (VF_REFERENCE_LEVEL-wZero))
 				{
-					if (bGainIdx < (GAIN_SETTINGS_MAX-1))
-						bGainIdx++;
 					g_bGainDDS[bBand] = bGainIdx;
 					break;
 				}
@@ -155,7 +156,6 @@ void Calibrate_Reflectometer (void)
 				g_bGainDDS[bBand] = GAIN_SETTINGS_MAX-1;
 			}
 		}
-
 										//
 										// 50ohm load
 		if (!WaitLoadUser(g50OhmLoadStr))
@@ -244,22 +244,11 @@ void Calibrate_Reflectometer (void)
 	UART_Start(UART_PARITY_NONE); 		// Enable UART
 	M8C_EnableGInt ;
 	UART_PutChar(12); 					// Clear the screen
-/*
-										// Print offset
-	UART_CPutString("Offset, VF=");
-	ltoa(szMsg, g_xBridgeOffset.Vf, 10);
-	UART_PutString(szMsg);
-	UART_CPutString(", VR=");
-	ltoa(szMsg, g_xBridgeOffset.Vr, 10);
-	UART_PutString(szMsg);
-	UART_CPutString(", VA=");
-	ltoa(szMsg, g_xBridgeOffset.Va, 10);
-	UART_PutString(szMsg);
-	UART_CPutString(", VZ=");
-	ltoa(szMsg, g_xBridgeOffset.Vz, 10);
+
+	UART_CPutString("Zero:");
+	itoa(szMsg, wZero, 10);
 	UART_PutString(szMsg);
 	UART_PutCRLF();
-*/
 										// Print correction factors
 	for (bBand=0; bBand<BAND_MAX;bBand++)
 	{
