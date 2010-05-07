@@ -48,6 +48,11 @@
 #include "glb_data.h"
 
 //-----------------------------------------------------------------------------
+//  Defines
+//-----------------------------------------------------------------------------
+#define NUM_AVE_SAMPLES			4		// Maximum 16
+
+//-----------------------------------------------------------------------------
 //  Prototypes
 //-----------------------------------------------------------------------------
 static DWORD TakeSample (void);
@@ -60,8 +65,6 @@ static DWORD TakeSample (void);
 //	Measure reflectometer voltages.
 //
 //  ARGUMENTS:
-//     	g_xBridgeOffset
-//		g_xBridgeCorrect
 //
 //  RETURNS:
 //     g_xBridgeMeasure
@@ -89,6 +92,25 @@ void Do_Measure ( void )
 	g_xBridgeMeasure.Vr = TakeSample();
 
 	PGA_ADC_SetGain(PGA_ADC_G2_67);		// Restores gain
+}
+//-----------------------------------------------------------------------------
+//  FUNCTION NAME:	Do_MeasureRfLevel
+//
+//  DESCRIPTION:
+//
+//	Measure Rf Level
+//
+//  ARGUMENTS:
+//
+//  RETURNS:
+//     g_xBridgeMeasure
+//
+//-----------------------------------------------------------------------------
+void Do_MeasureRfLevel ( void )
+{
+										// Read Vz
+	AMUX4_ADC_InputSelect(AMUX4_ADC_PORT0_5);
+	g_xBridgeMeasure.Vz = TakeSample();
 }
 
 //-----------------------------------------------------------------------------
@@ -122,15 +144,15 @@ static DWORD TakeSample (void)
 
 	if (g_bScanning == FALSE)			// If not scanning do some averaging
 	{
-		for (ii=0;ii<4;ii++)
+		ADCINC12_GetSamples(NUM_AVE_SAMPLES);
+		for (ii=0;ii<NUM_AVE_SAMPLES;ii++)
 		{
-			ADCINC12_GetSamples(1);
 										// Wait for data to be ready.
 			while(ADCINC12_fIsDataAvailable() == 0);
 			wVal += (ADCINC12_iGetData()+2048);
 			ADCINC12_ClearFlag();
 		}
-		wVal /= 4;
+		wVal /= NUM_AVE_SAMPLES;
 	}
 	else
 	{

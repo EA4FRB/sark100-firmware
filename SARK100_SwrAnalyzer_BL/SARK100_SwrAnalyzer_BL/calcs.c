@@ -82,8 +82,8 @@ WORD Calculate_Swr (DWORD dwVf, DWORD dwVr)
 		dwDenominator = 1;
 
 	dwNumerator = (dwVf+dwVr)*100;
-
 	wSwr = (dwNumerator/dwDenominator);
+
 	if (wSwr > SWR_MAX)
 		wSwr = SWR_MAX;
 
@@ -133,9 +133,13 @@ WORD Calculate_Z (DWORD dwVz, DWORD dwVa)
 //           R = ------------------
 //                50 * (SWR^2 + 1)
 //
+//      OR ...
+//                 (2500+Z^2)*SWR
+//           R =  --------------------
+//                  ((SWR^2)/2)+5000
 //  ARGUMENTS:
 //     wZ
-//		wSwr
+//	   wSwr
 //
 //  RETURNS:
 //     R
@@ -162,7 +166,7 @@ WORD Calculate_R (WORD wZ, WORD wSwr)
 //
 //	Calculates impedance
 //
-//           X = SQRT ( Z_squared - R_squared )
+//           X = SQRT ( Z^2 - R^2 )
 //
 //  ARGUMENTS:
 //     	wZ
@@ -177,9 +181,9 @@ WORD Calculate_X (WORD wZ, WORD wR)
 	DWORD dwTemp;
 	WORD wX;
 
-	dwTemp = ((DWORD)wZ*wZ)-((DWORD)wR*wR);
-	if ((signed long)dwTemp<0)
+	if (((signed long)wZ-(signed long)wR)<=1)
 		return 0;
+	dwTemp = ((DWORD)wZ*wZ)-((DWORD)wR*wR);
 
 	wX = Calc_Sqrt(dwTemp);
 

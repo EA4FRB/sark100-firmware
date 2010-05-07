@@ -62,6 +62,7 @@
 void DISP_Setup ( void )
 {
 	LCD_Start();
+	LCD_InitBG(LCD_SOLID_BG);
 }
 //-----------------------------------------------------------------------------
 //  FUNCTION NAME: DISP_Frequency
@@ -262,3 +263,4 @@ void DISP_Clear (void)
 {
 	LCD_Control(LCD_CLEAR);
 }
+

@@ -56,7 +56,8 @@ typedef struct							// Reflectometer values
 //-----------------------------------------------------------------------------
 //  Prototypes
 //-----------------------------------------------------------------------------
-void Do_Measure(void);
+extern void Do_Measure(void);
+extern void Do_MeasureRfLevel(void);
 
 //-----------------------------------------------------------------------------
 #endif

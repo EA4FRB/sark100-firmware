@@ -47,7 +47,7 @@
 //-----------------------------------------------------------------------------
 //  Version string
 //-----------------------------------------------------------------------------
-#define VERSION_STR			"V10"
+#define VERSION_STR			"V11"
 #define PRODUCT_NAME_STR	"SARK100"
 
 //-----------------------------------------------------------------------------
@@ -81,7 +81,6 @@ typedef enum {							// Mode menu
 	MODE_IMP,
 	MODE_CAP,
 	MODE_IND,
-//	MODE_VFO,
 	MODE_OFF,
 
 	MODE_MAX

@@ -53,8 +53,6 @@
 #include "calibrate_reflectometer.h"
 #include "pclink.h"
 
-//#define DEBUG	1
-
 //-----------------------------------------------------------------------------
 //  Defines
 //-----------------------------------------------------------------------------
@@ -79,6 +77,8 @@
 
 #define COL_FREQ			6
 #define ROW_FREQ			0
+
+#define SWR_BANDWIDTH		200
 
 //-----------------------------------------------------------------------------
 //  Prototypes
@@ -135,9 +135,6 @@ void main()
 	WORD wDizzlingX;
 	BYTE bFrChMode = FALSE;
 	BYTE bIncCtl = 4;					// Cursor position index. Default set to 10Khz
-#ifdef DEBUG
-	BYTE szMsg[20];
-#endif
 
 	g_bScanning = FALSE;
 	M8C_ClearWDTAndSleep;				// Put sleep and watchdog timers into a known state
@@ -214,13 +211,6 @@ void main()
 		DISP_Clear();
 	}
 
-#ifdef DEBUG
-	UART_CmdReset(); 					// Initialize receiver/cmd buffer
-	UART_IntCntl(UART_ENABLE_RX_INT); 	// Enable RX interrupts
-	UART_Start(UART_PARITY_NONE); 		// Enable UART
-	M8C_EnableGInt ;
-	UART_PutChar(12); 					// Clear the screen
-#endif
 										// Resets iddle counter
 	g_bIddleCounter = GetUserIddle(g_xConf.bUserIddle);
 	do
@@ -235,68 +225,23 @@ void main()
 		DISP_Clear();
 		LCD_Position(ROW_MODE, COL_MODE);
 		LCD_PrCString(gModeStr[bMode]);
-		LCD_Position(ROW_FREQ, COL_FREQ);
-		DISP_Frequency(dwCurrentFreq);
-										// Set cursor position
-		LCD_Position(ROW_FREQ, gxIncrementControl[bIncCtl].bCol);
+		if (bMode != MODE_OFF)
+		{
+			LCD_Position(ROW_FREQ, COL_FREQ);
+			DISP_Frequency(dwCurrentFreq);
+		}	
 		do
 		{
 										// If frequency is scrolled fast it does not measure
 			if ((bMode != MODE_OFF)&&!((bKey==KBD_2xUP)||(bKey==KBD_2xDWN)))
 			{
 				Do_Measure();
-#ifdef DEBUG
-				UART_CPutString("[Raw] Vf=");
-				ltoa(szMsg, g_xBridgeMeasure.Vf, 10);
-				UART_PutString(szMsg);
-				UART_CPutString("\tVr=");
-				ltoa(szMsg, g_xBridgeMeasure.Vr, 10);
-				UART_PutString(szMsg);
-				UART_CPutString("\tVz=");
-				ltoa(szMsg, g_xBridgeMeasure.Vz, 10);
-				UART_PutString(szMsg);
-				UART_CPutString("\tVa=");
-				ltoa(szMsg, g_xBridgeMeasure.Va, 10);
-				UART_PutString(szMsg);
-				UART_PutCRLF();
-#endif
 				Do_Correct();
-#ifdef DEBUG
-				UART_CPutString("[Corr] Vf=");
-				ltoa(szMsg, g_xBridgeMeasure.Vf, 10);
-				UART_PutString(szMsg);
-				UART_CPutString("\tVr=");
-				ltoa(szMsg, g_xBridgeMeasure.Vr, 10);
-				UART_PutString(szMsg);
-				UART_CPutString("\tVz=");
-				ltoa(szMsg, g_xBridgeMeasure.Vz, 10);
-				UART_PutString(szMsg);
-				UART_CPutString("\tVa=");
-				ltoa(szMsg, g_xBridgeMeasure.Va, 10);
-				UART_PutString(szMsg);
-				UART_PutCRLF();
-#endif
 										// Do the basic calcs
 				gwSwr = Calculate_Swr(g_xBridgeMeasure.Vf, g_xBridgeMeasure.Vr);
 				gwZ = Calculate_Z(g_xBridgeMeasure.Vz, g_xBridgeMeasure.Va);
 				gwR = Calculate_R(gwZ, gwSwr);
 				gwX = Calculate_X(gwZ, gwR);
-#ifdef DEBUG
-				UART_CPutString("[Meas] Swr=");
-				itoa(szMsg, gwSwr, 10);
-				UART_PutString(szMsg);
-				UART_CPutString("\tZ=");
-				itoa(szMsg, gwZ, 10);
-				UART_PutString(szMsg);
-				UART_CPutString("\tR=");
-				itoa(szMsg, gwR, 10);
-				UART_PutString(szMsg);
-				UART_CPutString("\tX=");
-				itoa(szMsg, gwX, 10);
-				UART_PutString(szMsg);
-				UART_PutCRLF();
-				UART_PutCRLF();
-#endif
 
 										// Display data depending mode
 				switch (bMode)
@@ -359,12 +304,20 @@ void main()
 						break;
 				}
 			}
-										// Set cursor position
-			LCD_Position(ROW_FREQ, gxIncrementControl[bIncCtl].bCol);
-			if (bFrChMode==TRUE)
-				LCD_Control(LCD_ON_BLINK);
+			if (bMode == MODE_OFF)
+			{
+				Do_MeasureRfLevel();
+				LCD_DrawBG(ROW_SWR, 0, 16, (g_xBridgeMeasure.Vz*80)/4000);
+			}
 			else
-				LCD_Control(LCD_ON_CURSOR);
+			{
+										// Set cursor position
+				LCD_Position(ROW_FREQ, gxIncrementControl[bIncCtl].bCol);
+				if (bFrChMode==TRUE)
+					LCD_Control(LCD_ON_BLINK);
+				else
+					LCD_Control(LCD_ON_CURSOR);
+			}					
 										// Waits for key or time for new measurement
 			g_bMeasureCounter = MEASURE_PERIOD;
 			do
@@ -398,8 +351,6 @@ void main()
 							PGA_DDS_1_Start(PGA_DDS_1_HIGHPOWER);
 							PGA_DDS_2_Start(PGA_DDS_2_HIGHPOWER);
 							Adjust_Dds_Gain(bBand);
-							ADCINC12_Start(ADCINC12_HIGHPOWER); // Turn on Analog section
-							PGA_ADC_Start(PGA_ADC_HIGHPOWER);
 
 										// Enables DDS oscillator and backlight (shared port)
 							DDS_Set(dwCurrentFreq);
@@ -415,8 +366,6 @@ void main()
 							DDS_Set(0);
 							PGA_DDS_1_Stop();
 							PGA_DDS_2_Stop();
-							ADCINC12_Stop();
-							PGA_ADC_Stop();
 
 										// Disables DDS oscillator and backlight (shared port)
 							//XO_EN_Data_ADDR &= ~XO_EN_MASK;
@@ -605,7 +554,7 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 	DWORD dwResonanceFreq = -1;
 	DWORD dwBwMinFreq = -1;
 	DWORD dwBwMaxFreq = -1;
-	WORD wSwrMin = 200;
+	WORD wSwrMin = SWR_BANDWIDTH;
 	BYTE bKey;
 
 										// Display mode
@@ -633,7 +582,7 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 		LCD_Position(ROW_SWR, COL_SWR);
 		DISP_Swr(gwSwr);
 										// Code to detect 2.0 SWR limits
-		if (gwSwr <= wSwrMin)
+		if (gwSwr <= SWR_BANDWIDTH)
 		{
 			if (dwBwMinFreq==-1)
 			{
@@ -642,8 +591,6 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 				BUZZ_Beep();
 				dwBwMinFreq = dwCurrentFreq;
 			}
-			wSwrMin = gwSwr;
-			dwResonanceFreq = dwCurrentFreq;
 		}
 		else
 		{
@@ -654,6 +601,11 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 				BUZZ_Beep();
 				dwBwMaxFreq = dwCurrentFreq;
 			}
+		}
+		if (gwSwr <= wSwrMin)
+		{
+			dwResonanceFreq = dwCurrentFreq;
+			wSwrMin = gwSwr;
 		}
 		dwCurrentFreq += GetStep(bStep);
 	} while (dwCurrentFreq < dwLimitFreq);
