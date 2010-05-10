@@ -229,7 +229,7 @@ void main()
 		{
 			LCD_Position(ROW_FREQ, COL_FREQ);
 			DISP_Frequency(dwCurrentFreq);
-		}	
+		}
 		do
 		{
 										// If frequency is scrolled fast it does not measure
@@ -317,7 +317,7 @@ void main()
 					LCD_Control(LCD_ON_BLINK);
 				else
 					LCD_Control(LCD_ON_CURSOR);
-			}					
+			}
 										// Waits for key or time for new measurement
 			g_bMeasureCounter = MEASURE_PERIOD;
 			do
@@ -522,10 +522,9 @@ void main()
 					PGA_DDS_1_Start(PGA_DDS_1_HIGHPOWER);
 					PGA_DDS_2_Start(PGA_DDS_2_HIGHPOWER);
 					Adjust_Dds_Gain(bBand);
-
-					ADCINC12_Start(ADCINC12_HIGHPOWER); // Turn on Analog section
-					PGA_ADC_Start(PGA_ADC_HIGHPOWER);
 				}
+				ADCINC12_Start(ADCINC12_HIGHPOWER); // Turn on Analog section
+				PGA_ADC_Start(PGA_ADC_HIGHPOWER);
 				bKey = 1;				// Forces exit loop
 			}
 		} while (bKey==0);
