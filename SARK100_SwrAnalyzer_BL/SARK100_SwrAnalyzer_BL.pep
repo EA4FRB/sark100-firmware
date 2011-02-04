@@ -1,18 +1,6 @@
 <?xml version="1.0"?>
 <PSOC_WND_PERSIST>
   <APP_EDITOR_SETTINGS>
-    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL.soc" ACTIVE="true" />
-    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL.cmx" />
-    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\main.c" />
-    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\measure.c" />
-    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\calcs.c" />
-    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\calibrate_reflectometer.c" />
-    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\glb_data.c" />
-    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\glb_data.h" />
-    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\msg_eng.c" />
-    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\measure.h" />
-    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\display.h" />
-    <OPEN_FILE PATH="C:\work\RadioHam\psoc\SwrAnalyzer\prj\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\SARK100_SwrAnalyzer_BL\display.c" />
   </APP_EDITOR_SETTINGS>
   <DEBUGGER_SETTINGS>
     <TRACE_MODE VALUE="PCOnly" />
