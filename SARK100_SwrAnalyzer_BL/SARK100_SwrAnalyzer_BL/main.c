@@ -620,9 +620,16 @@ static DWORD Mode_Scan (BYTE bBand, BYTE bStep)
 			wSwrMin = gwSwr;
 		}
 		dwCurrentFreq += GetStep(bStep);
+
+		if (KEYPAD_Get()==KBD_UP)		// Cancel
+		{
+			DDS_Set(0);
+			return-1;
+		}
 	} while (dwCurrentFreq < dwLimitFreq);
 
 										// End of scanning
+	DDS_Set(0);
 	BUZZ_Beep();
 	DISP_Clear();
 	LCD_Position(0, 0);
