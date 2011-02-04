@@ -47,7 +47,7 @@
 BYTE const gBlankStr	[] = "                ";
 
 BYTE const gWelcome1Str	[] = PRODUCT_NAME_STR " ANALYZER";
-BYTE const gWelcome2Str	[] = "(c)EA4FRB 10 " VERSION_STR;
+BYTE const gWelcome2Str	[] = "(c)EA4FRB 11 " VERSION_STR;
 
 BYTE const gConfigPcLinkStr	[] = "PC Link";
 BYTE const gConfigStepStr	[] = "Step Size";

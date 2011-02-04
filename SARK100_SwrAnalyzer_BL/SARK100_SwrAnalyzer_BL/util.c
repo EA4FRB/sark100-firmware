@@ -193,8 +193,13 @@ BYTE GetBand (DWORD dwFreq)
 			break;
 	}
 	if (bBand>=BAND_MAX)
-		return -1;
-
+	{
+		if (dwFreq>=FREQ_MAX)
+			return -1;
+		if (dwFreq<FREQ_MIN)
+			return -1;
+		bBand=BAND_MAX-1;
+	}
 	return bBand;
 }
 

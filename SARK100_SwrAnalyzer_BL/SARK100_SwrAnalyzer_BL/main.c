@@ -340,7 +340,8 @@ void main()
 						g_xBridgeCorrect = g_xBandCorrFactor[bBand];
 										// Adjust DDS gain setting
 						Adjust_Dds_Gain(bBand);
-						DDS_Set(dwCurrentFreq);
+						if (bMode != MODE_OFF)
+							DDS_Set(dwCurrentFreq);
 						LCD_Control(LCD_ON_CURSOR);
 						break;
 
@@ -373,6 +374,8 @@ void main()
 						break;
 
 					case KBD_BAND:
+						if (bMode == MODE_OFF)
+							break;
 						bFrChMode=FALSE;
 						LCD_Control(LCD_ON);
 
@@ -397,6 +400,9 @@ void main()
 						break;
 
 					case KBD_SCAN:
+						if (bMode == MODE_OFF)
+							break;
+
 						bFrChMode=FALSE;
 						LCD_Control(LCD_ON);
 
@@ -413,6 +419,8 @@ void main()
 						break;
 
 					case KBD_UP_DWN:
+						if (bMode == MODE_OFF)
+							break;
 										// Toggle between cursor or frequency change modes
 						if (bFrChMode==TRUE)
 							bFrChMode=FALSE;
@@ -422,6 +430,8 @@ void main()
 
 					case KBD_2xUP:
 					case KBD_UP:
+						if (bMode == MODE_OFF)
+							break;
 										// Moves frequency cursor
 						if (bFrChMode==TRUE)
 						{
@@ -449,6 +459,9 @@ void main()
 
 					case KBD_2xDWN:
 					case KBD_DWN:
+						if (bMode == MODE_OFF)
+							break;
+
 										// Moves frequency cursor
 						if (bFrChMode==TRUE)
 						{
