@@ -194,7 +194,7 @@ BYTE GetBand (DWORD dwFreq)
 	}
 	if (bBand>=BAND_MAX)
 	{
-		if (dwFreq>=FREQ_MAX)
+		if (dwFreq>FREQ_MAX)
 			return -1;
 		if (dwFreq<FREQ_MIN)
 			return -1;
