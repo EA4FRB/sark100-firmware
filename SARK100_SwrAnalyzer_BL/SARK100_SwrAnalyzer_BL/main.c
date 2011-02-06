@@ -776,7 +776,11 @@ static void Mode_Config (void)
 						DISP_Clear();
 						LCD_Position(0, 0);
 						LCD_PrCString(gSwLoadingStr);
-						M8C_Reset;		// Perform Software Reset by Supervisory Call
+
+						// Perform Software Reset
+						M8C_DisableGInt;
+						asm ("ljmp 0x0000");
+						//M8C_Reset;		// Doesn't work always
 					}
 					break;
 			}
