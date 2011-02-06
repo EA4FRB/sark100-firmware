@@ -106,7 +106,7 @@ void Calibrate_Reflectometer (void)
 {
 	BYTE bBand;
 	WORD wZero;
-	
+
 	do
 	{
 		DISP_Clear();
@@ -120,7 +120,7 @@ void Calibrate_Reflectometer (void)
 
 		DDS_Set(10000000);
 		Delay_Ms(WAIT_TIME_MEASURE);
-		
+
 										// Measures zero level
 		PGA_ADC_GAIN_CR1 &= ~1;			// Set input to RefLO
 		ADCINC12_GetSamples(1);
@@ -128,9 +128,9 @@ void Calibrate_Reflectometer (void)
 		while(ADCINC12_fIsDataAvailable() == 0);
 		wZero = (ADCINC12_iGetData()+2048);
 		ADCINC12_ClearFlag();
-	
+
 		PGA_ADC_GAIN_CR1 |= 1;			// Set input to PortInp
-		
+
 										//
 										// Adjust Vf
 		for (bBand=0; bBand<BAND_MAX;bBand++)
@@ -192,7 +192,7 @@ void Calibrate_Reflectometer (void)
 			xCalVz[bBand].wY1 = (DWORD)((DWORD)g_xBridgeMeasure.Vf*CORRECTION_FACTOR*3)/(DWORD)(4*g_xBridgeMeasure.Vz);
 			xCalVa[bBand].wX1 = g_xBridgeMeasure.Va;
 			xCalVa[bBand].wY1 = (DWORD)((DWORD)g_xBridgeMeasure.Vf*CORRECTION_FACTOR)/(DWORD)(4*g_xBridgeMeasure.Va);
-			
+
 			xCalVr[bBand].wX0 = g_xBridgeMeasure.Vr;
 			xCalVr[bBand].wY0 = ((DWORD)(((SWR_150_LOAD-100)*g_xBridgeMeasure.Vf)/(SWR_150_LOAD+100))*CORRECTION_FACTOR)/(DWORD)g_xBridgeMeasure.Vr;
         }
@@ -214,7 +214,7 @@ void Calibrate_Reflectometer (void)
 			xCalVr[bBand].wX1 = g_xBridgeMeasure.Vr;
 			xCalVr[bBand].wY1 = ((DWORD)(((SWR_274_LOAD-100)*g_xBridgeMeasure.Vf)/(SWR_274_LOAD+100))*CORRECTION_FACTOR)/(DWORD)g_xBridgeMeasure.Vr;
 
-										// Convert calibration factor to slope and offset		
+										// Convert calibration factor to slope and offset
 			Calc_Correct(&g_xBandCorrFactor[bBand].xVz, &xCalVz[bBand]);
 			Calc_Correct(&g_xBandCorrFactor[bBand].xVa, &xCalVa[bBand]);
 			Calc_Correct(&g_xBandCorrFactor[bBand].xVr, &xCalVr[bBand]);
@@ -313,7 +313,7 @@ void Do_Correct (void)
 	{
 		g_xBridgeMeasure.Vz *= Correct_Measure(&g_xBridgeCorrect.xVz, g_xBridgeMeasure.Vz);
 		g_xBridgeMeasure.Va *= Correct_Measure(&g_xBridgeCorrect.xVa, g_xBridgeMeasure.Va);
-	}	
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -408,6 +408,6 @@ static BOOL WaitLoadUser (const char *pszText)
 	LCD_PrCString(gConfigCalibStr);
 	LCD_Position(1, 0);
 	LCD_PrCString(gInProgressStr);
-	
+
 	return TRUE;
 }
