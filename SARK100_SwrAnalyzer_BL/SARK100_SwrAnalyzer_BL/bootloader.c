@@ -38,6 +38,7 @@
 //*****************************************************************************/
 #include <m8c.h>        	// part specific constants and macros
 #include "bootloader.h"    	// API definitions for all BootLoader Modules
+#include "psocgpioint.h"
 #include <FlashBlock.h>
 
 #define LAST_BLOCK_TO_CHECK	0		// Minimum = 1; Maximum = 455; if 0 then don't calculate CS
@@ -226,13 +227,8 @@ void BootLoader(){
          if (CheckSum!=FlashCheckSum(j)) Error=1;	// Set CheckSum Error Flag
       }
     }
-    // Check button to enter bootloader mode
-//    SETBUTTON();		// pull up for Button
-//    if (!GETBUTTON())
-      if (!Error) asm("ljmp __Start");	// if button not pressed - Start Firmwire
-
+    if (!Error) asm("ljmp __Start");	// if button not pressed - Start Firmwire
     // Here it communicates with PC and then starts programming
-//	BOOTLOADER_MODE_LED_ON();		// light on LED when entered BootLoader Mode
 
  	// Connect with PC Terminal Program
 	Error=1;
