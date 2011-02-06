@@ -372,10 +372,10 @@ static void Cmd_Scan (BYTE bRaw)
 	DWORD dwLimitFreq;
 	DWORD dwStepFreq;
 	BYTE bBand;
-	BYTE bBandEnd;
+	BYTE bBandSave;
 	char * strPtr; 						// Parameter pointer
 
-	g_bScanning = TRUE;
+	g_bScanning = FALSE;
 	do
 	{
 										// Get start frequency
@@ -400,8 +400,8 @@ static void Cmd_Scan (BYTE bRaw)
 			break;
 		}
 		dwEndFreq = atol(strPtr);
-		bBandEnd = GetBand(dwEndFreq);
-		if (bBandEnd==-1)
+		bBand = GetBand(dwEndFreq);
+		if (bBand==-1)
 		{
 			UART_CPutString(gszErrInvalidFreq);
 			break;
@@ -414,24 +414,28 @@ static void Cmd_Scan (BYTE bRaw)
 			UART_CPutString(gszErrExpectStep);
 			break;
 		}
-		dwStepFreq = atoi(strPtr);
+		dwStepFreq = atol(strPtr);
 
 		UART_CPutString(gszStart);
-		for (; dwFreq < dwEndFreq; bBand++)
-		{
-			g_xBridgeCorrect = g_xBandCorrFactor[bBand];
-			Adjust_Dds_Gain(bBand);
-			dwLimitFreq = g_xBandLimits[bBand].high * BAND_FREQ_MULT;
 
-			do
+		for (bBandSave=-1; dwFreq < dwEndFreq;)
+		{
+			DDS_Set(dwFreq);
+			Delay_Ms(10);
+
+			bBand = GetBand(dwFreq);
+			if (bBand!=bBandSave)
 			{
-				DDS_Set(dwFreq);
-				if (bRaw)
-					Cmd_Raw();
-				else
-					Cmd_Imp();
-				dwFreq += dwStepFreq;
-			} while ((dwFreq < dwLimitFreq) && (dwFreq < dwEndFreq));
+				bBandSave=bBand;
+				g_xBridgeCorrect = g_xBandCorrFactor[bBand];
+				Adjust_Dds_Gain(bBand);
+				Delay_Ms(50);
+			}
+			if (bRaw)
+				Cmd_Raw();
+			else
+				Cmd_Imp();
+			dwFreq += dwStepFreq;
 		}
 		UART_CPutString(gszEnd);
 		if (gdwCurrentFreq==-1)
