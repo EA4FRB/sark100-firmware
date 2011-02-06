@@ -50,7 +50,7 @@
 //-----------------------------------------------------------------------------
 //  Defines
 //-----------------------------------------------------------------------------
-#define NUM_AVE_SAMPLES			4		// Maximum 16
+#define NUM_AVE_SAMPLES			8		// Maximum 16
 
 //-----------------------------------------------------------------------------
 //  Prototypes
@@ -161,8 +161,8 @@ static DWORD TakeSample (void)
 		while(ADCINC12_fIsDataAvailable() == 0);
 		wVal = (ADCINC12_iGetData()+2048);
 		ADCINC12_ClearFlag();
-	}	
-	
+	}
+
 	if (wVal >= wZero)
 		return wVal-wZero;
 	else
