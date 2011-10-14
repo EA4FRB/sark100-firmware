@@ -521,9 +521,17 @@ void main()
 										// Resumes
 										// Display on
 				LCD_Control(LCD_ON_CURSOR);
+
 										// Enables DDS oscillator and backlight (shared port)
 				XO_EN_Data_ADDR |= XO_EN_MASK;
 				Port_2_Data_SHADE |= XO_EN_MASK;
+				Delay_Ms(10);
+				XO_EN_Data_ADDR &= ~XO_EN_MASK;
+				Port_2_Data_SHADE &= ~XO_EN_MASK;
+				Delay_Ms(10);
+				XO_EN_Data_ADDR |= XO_EN_MASK;
+				Port_2_Data_SHADE |= XO_EN_MASK;
+				Delay_Ms(10);
 
 				DDS_Init();
 
