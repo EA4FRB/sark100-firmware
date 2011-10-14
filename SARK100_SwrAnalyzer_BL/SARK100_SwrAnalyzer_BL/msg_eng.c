@@ -132,7 +132,7 @@ BYTE const *gBandStr[] = {
 
 BYTE const gModeScanStr			[] = "SCAN";
 
-BYTE const gErrorAdjustVfStr	[] = "Error Vf Level ";
+BYTE const gErrorAdjustVfStr	[] = "Error Vf Level  ";
 
 BYTE const gInProgressStr		[] = "In progress...";
 BYTE const gDoneStr				[] = "Done          ";
@@ -144,7 +144,7 @@ BYTE const g150OhmLoadStr		[] = "Conn 150 \xf4 load ";
 BYTE const g274OhmLoadStr		[] = "Conn 274 \xf4 load ";
 
 BYTE const gErrorUncalibratedStr[] = "Uncalibrated !! ";
-BYTE const gPressAnyKeyStr		[] = "Press any key";
+BYTE const gPressAnyKeyStr		[] = "Press any key   ";
 
 BYTE const gNotImplementedStr	[] = "Not Implemented";
 
