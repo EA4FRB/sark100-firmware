@@ -274,10 +274,10 @@ void main()
 							DDS_Set(dwCurrentFreq);
          								//Increasing X with increasing F ==> inductive reactance = +j
          								//Decreasing X with increasing F ==> capacitive reactance = -j
-										//If value <20 consider undeterminate to avoid bouncing
-							if (abs((INT)wDizzlingX-gwX)<20)
+										//If value <2 consider undeterminate to avoid bouncing
+							if (abs((INT)wDizzlingX-gwX)<2)
 								bSign = ' ';
-							else if (wDizzlingX>gwX)
+							else if (wDizzlingX<gwX)
 								bSign = '+';
 							else
 								bSign = '-';
